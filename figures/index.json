@@ -1,0 +1,25 @@
+{
+  "contract": 1,
+  "figures": [
+    {
+      "id": "barst",
+      "name": "Barst",
+      "path": "figures/barst.json"
+    },
+    {
+      "id": "fighter",
+      "name": "Authored fighter",
+      "path": "figures/fighter.json"
+    },
+    {
+      "id": "kiran",
+      "name": "Kiran",
+      "path": "figures/kiran.json"
+    },
+    {
+      "id": "yuliya",
+      "name": "Yuliya",
+      "path": "figures/yuliya.json"
+    }
+  ]
+}

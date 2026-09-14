@@ -1,0 +1,126 @@
+{
+  "contract": 1,
+  "sets": [
+    {
+      "id": "armory",
+      "name": "Armory",
+      "rig": "fighter",
+      "pieces": [
+        {
+          "id": "longsword",
+          "reference": "cosmetics/armory/longsword.svg",
+          "kind": "weapon",
+          "height": 73,
+          "fitted": [
+            "barst",
+            "fighter",
+            "kiran",
+            "yuliya"
+          ],
+          "hides": []
+        }
+      ]
+    },
+    {
+      "id": "field-kit",
+      "name": "Field kit",
+      "rig": "fighter",
+      "pieces": [
+        {
+          "id": "field-belt",
+          "reference": "cosmetics/field-kit/field-belt.svg",
+          "kind": "belt",
+          "height": 7,
+          "fitted": [
+            "barst",
+            "kiran"
+          ],
+          "hides": []
+        },
+        {
+          "id": "full-helm",
+          "reference": "cosmetics/field-kit/full-helm.svg",
+          "kind": "mask",
+          "height": 56,
+          "fitted": [
+            "barst",
+            "fighter",
+            "kiran",
+            "yuliya"
+          ],
+          "hides": [
+            "head"
+          ]
+        },
+        {
+          "id": "long-hair",
+          "reference": "cosmetics/field-kit/long-hair.svg",
+          "kind": "hair",
+          "height": 28,
+          "fitted": [
+            "kiran",
+            "yuliya"
+          ],
+          "hides": []
+        },
+        {
+          "id": "trail-cloak",
+          "reference": "cosmetics/field-kit/trail-cloak.svg",
+          "kind": "cloak",
+          "height": 56,
+          "fitted": [
+            "fighter",
+            "yuliya"
+          ],
+          "hides": []
+        }
+      ]
+    },
+    {
+      "id": "royal-guard",
+      "name": "Royal guard",
+      "rig": "fighter",
+      "pieces": [
+        {
+          "id": "hood",
+          "reference": "cosmetics/royal-guard/hood.svg",
+          "kind": "hat",
+          "height": 28,
+          "fitted": [
+            "barst",
+            "fighter",
+            "kiran",
+            "yuliya"
+          ],
+          "hides": []
+        },
+        {
+          "id": "pauldron",
+          "reference": "cosmetics/royal-guard/pauldron.svg",
+          "kind": "pauldron",
+          "height": 18,
+          "fitted": [
+            "barst",
+            "fighter",
+            "kiran",
+            "yuliya"
+          ],
+          "hides": []
+        },
+        {
+          "id": "skirt",
+          "reference": "cosmetics/royal-guard/skirt.svg",
+          "kind": "skirt",
+          "height": 34,
+          "fitted": [
+            "barst",
+            "fighter",
+            "kiran",
+            "yuliya"
+          ],
+          "hides": []
+        }
+      ]
+    }
+  ]
+}

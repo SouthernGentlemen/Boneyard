@@ -1,0 +1,247 @@
+{
+  "contract": 1,
+  "parts": {
+    "characters/barst/parts/arm_lower_l.svg": {
+      "raw": 4165,
+      "gzip": 1390
+    },
+    "characters/barst/parts/arm_lower_r.svg": {
+      "raw": 3641,
+      "gzip": 1243
+    },
+    "characters/barst/parts/arm_upper_l.svg": {
+      "raw": 2478,
+      "gzip": 859
+    },
+    "characters/barst/parts/arm_upper_r.svg": {
+      "raw": 2911,
+      "gzip": 1011
+    },
+    "characters/barst/parts/head.svg": {
+      "raw": 32287,
+      "gzip": 9762
+    },
+    "characters/barst/parts/leg_lower_l.svg": {
+      "raw": 1609,
+      "gzip": 593
+    },
+    "characters/barst/parts/leg_lower_r.svg": {
+      "raw": 2170,
+      "gzip": 822
+    },
+    "characters/barst/parts/leg_upper_l.svg": {
+      "raw": 1949,
+      "gzip": 670
+    },
+    "characters/barst/parts/leg_upper_r.svg": {
+      "raw": 2123,
+      "gzip": 764
+    },
+    "characters/barst/parts/pelvis.svg": {
+      "raw": 1519,
+      "gzip": 580
+    },
+    "characters/barst/parts/torso.svg": {
+      "raw": 9259,
+      "gzip": 2928
+    },
+    "characters/fighter/parts/arm_lower_l.svg": {
+      "raw": 139,
+      "gzip": 143
+    },
+    "characters/fighter/parts/arm_lower_r.svg": {
+      "raw": 146,
+      "gzip": 148
+    },
+    "characters/fighter/parts/arm_upper_l.svg": {
+      "raw": 134,
+      "gzip": 140
+    },
+    "characters/fighter/parts/arm_upper_r.svg": {
+      "raw": 135,
+      "gzip": 141
+    },
+    "characters/fighter/parts/head.svg": {
+      "raw": 241,
+      "gzip": 180
+    },
+    "characters/fighter/parts/leg_lower_l.svg": {
+      "raw": 138,
+      "gzip": 143
+    },
+    "characters/fighter/parts/leg_lower_r.svg": {
+      "raw": 128,
+      "gzip": 137
+    },
+    "characters/fighter/parts/leg_upper_l.svg": {
+      "raw": 135,
+      "gzip": 139
+    },
+    "characters/fighter/parts/leg_upper_r.svg": {
+      "raw": 125,
+      "gzip": 131
+    },
+    "characters/fighter/parts/pelvis.svg": {
+      "raw": 136,
+      "gzip": 137
+    },
+    "characters/fighter/parts/torso.svg": {
+      "raw": 166,
+      "gzip": 150
+    },
+    "characters/kiran/parts/arm_lower_l.svg": {
+      "raw": 4991,
+      "gzip": 1647
+    },
+    "characters/kiran/parts/arm_lower_r.svg": {
+      "raw": 3926,
+      "gzip": 1339
+    },
+    "characters/kiran/parts/arm_upper_l.svg": {
+      "raw": 2436,
+      "gzip": 882
+    },
+    "characters/kiran/parts/arm_upper_r.svg": {
+      "raw": 1451,
+      "gzip": 556
+    },
+    "characters/kiran/parts/head.svg": {
+      "raw": 37825,
+      "gzip": 11379
+    },
+    "characters/kiran/parts/leg_lower_l.svg": {
+      "raw": 2395,
+      "gzip": 887
+    },
+    "characters/kiran/parts/leg_lower_r.svg": {
+      "raw": 2299,
+      "gzip": 873
+    },
+    "characters/kiran/parts/leg_upper_l.svg": {
+      "raw": 1770,
+      "gzip": 638
+    },
+    "characters/kiran/parts/leg_upper_r.svg": {
+      "raw": 2304,
+      "gzip": 814
+    },
+    "characters/kiran/parts/pelvis.svg": {
+      "raw": 3600,
+      "gzip": 1207
+    },
+    "characters/kiran/parts/torso.svg": {
+      "raw": 2813,
+      "gzip": 985
+    },
+    "characters/yuliya/parts/arm_lower_l.svg": {
+      "raw": 4080,
+      "gzip": 1380
+    },
+    "characters/yuliya/parts/arm_lower_r.svg": {
+      "raw": 3613,
+      "gzip": 1226
+    },
+    "characters/yuliya/parts/arm_upper_l.svg": {
+      "raw": 3348,
+      "gzip": 1161
+    },
+    "characters/yuliya/parts/arm_upper_r.svg": {
+      "raw": 2595,
+      "gzip": 942
+    },
+    "characters/yuliya/parts/head.svg": {
+      "raw": 44558,
+      "gzip": 13429
+    },
+    "characters/yuliya/parts/leg_lower_l.svg": {
+      "raw": 2786,
+      "gzip": 958
+    },
+    "characters/yuliya/parts/leg_lower_r.svg": {
+      "raw": 2286,
+      "gzip": 852
+    },
+    "characters/yuliya/parts/leg_upper_l.svg": {
+      "raw": 2209,
+      "gzip": 833
+    },
+    "characters/yuliya/parts/leg_upper_r.svg": {
+      "raw": 2246,
+      "gzip": 849
+    },
+    "characters/yuliya/parts/pelvis.svg": {
+      "raw": 5456,
+      "gzip": 1759
+    },
+    "characters/yuliya/parts/torso.svg": {
+      "raw": 3227,
+      "gzip": 1166
+    }
+  },
+  "cosmetics": {
+    "cosmetics/armory/longsword.svg": {
+      "raw": 5321,
+      "gzip": 1833
+    },
+    "cosmetics/field-kit/field-belt.svg": {
+      "raw": 1605,
+      "gzip": 609
+    },
+    "cosmetics/field-kit/full-helm.svg": {
+      "raw": 4853,
+      "gzip": 1448
+    },
+    "cosmetics/field-kit/long-hair.svg": {
+      "raw": 2930,
+      "gzip": 1072
+    },
+    "cosmetics/field-kit/trail-cloak.svg": {
+      "raw": 3253,
+      "gzip": 1122
+    },
+    "cosmetics/royal-guard/hood.svg": {
+      "raw": 9455,
+      "gzip": 3147
+    },
+    "cosmetics/royal-guard/pauldron.svg": {
+      "raw": 5139,
+      "gzip": 1937
+    },
+    "cosmetics/royal-guard/skirt.svg": {
+      "raw": 9134,
+      "gzip": 3060
+    }
+  },
+  "figures": {
+    "figures/barst.json": {
+      "raw": 75171,
+      "gzip": 24378
+    },
+    "figures/fighter.json": {
+      "raw": 9729,
+      "gzip": 4159
+    },
+    "figures/kiran.json": {
+      "raw": 79479,
+      "gzip": 25948
+    },
+    "figures/yuliya.json": {
+      "raw": 87726,
+      "gzip": 28686
+    }
+  },
+  "catalogs": {
+    "catalog/clips.json": {
+      "raw": 38886,
+      "gzip": 5221
+    },
+    "figures/index.json": {
+      "raw": 425,
+      "gzip": 169
+    },
+    "cosmetics/index.json": {
+      "raw": 2694,
+      "gzip": 435
+    }
+  }
+}
