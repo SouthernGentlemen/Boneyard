@@ -123,9 +123,9 @@ export function main(argv: readonly string[]): number {
       note: args.values.get("note") ?? (derivedFrom === null
         ? "Authored by hand on SVGLab's eleven-bone rig."
         : `Hand-tweaked from ${derivedFrom}.`),
-      keyframes: read.keyframes,
+      poses: read.poses,
     }, { rig: catalog.rig, bandaiNamco: catalog.bandaiNamco });
-    const entry: Clip = { name: key, loop, duration: authored.duration, easing, note: authored.note, keyframes: authored.keyframes };
+    const entry: Clip = { name: key, loop, duration: authored.duration, easing, note: authored.note, poses: authored.poses };
     const moved = deviations(origin, entry);
     const dryRun = args.booleans.has("dry-run") || args.booleans.has("check");
     const target = join(ROOT, AUTHORED_DIR, `${key}.json`);
@@ -136,7 +136,6 @@ export function main(argv: readonly string[]): number {
       `- source file: \`${relative(ROOT, file)}\``,
       `- derived from: ${derivedFrom ?? "nothing — authored here"}`,
       `- duration: ${entry.duration} ticks${origin ? ` (was ${origin.duration})` : ""}`,
-      `- keyframes: ${entry.keyframes.length}${origin ? ` (was ${origin.keyframes.length})` : ""}`,
       `- playback: ${loop ? "loop" : "one-shot"}${loop ? `, seam ${display(read.seamDegrees)}° before closing` : ""}`,
       `- rest scale read from the file: ${display(read.scale)}`,
       "",
@@ -170,7 +169,7 @@ export function main(argv: readonly string[]): number {
       key,
       derivedFrom,
       duration: entry.duration,
-      keyframes: entry.keyframes.length,
+      poses: entry.poses.length,
       scale: read.scale,
       dropped: read.dropped,
       changes: moved,

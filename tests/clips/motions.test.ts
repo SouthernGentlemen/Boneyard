@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { buildCatalog } from "../../pipelines/motion/catalog.ts";
+import { sampleClip } from "../../src/rig/sample.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
 import type { StudyArtifact } from "../../pipelines/motion/build.ts";
 
 const SHIPPED = [
@@ -40,18 +42,21 @@ describe("Bandai Namco motion catalog", () => {
 
   it("holds the measured study weight and channel precision", () => {
     const catalog = buildCatalog(process.cwd());
-    expect(Buffer.byteLength(JSON.stringify(catalog.studies))).toBe(59_523);
+    // The two studies were 59,523 bytes as sparse per-tick keyframes — 97% of the old catalog
+    // budget, which is why they were kept out of the shipped lane. At a normalised thirteen
+    // poses they are 8,770, because a clip's weight no longer scales with how long it is.
+    expect(Buffer.byteLength(JSON.stringify(catalog.studies))).toBe(8_770);
     expect(catalog.manifest.defaults.rotationPrecision).toBe(1);
     expect(catalog.manifest.defaults.positionPrecision).toBe(2);
     expect(catalog.manifest.labels.content["12"]).toBe("punch");
     expect(catalog.manifest.labels.content["14"]).toBe("slash");
     expect(catalog.manifest.labels.style["0"]).toBe("normal");
     for (const clip of [...Object.values(catalog.bandaiNamco), ...Object.values(catalog.studies)]) {
-      for (const keyframe of clip.keyframes) {
-        for (const pose of Object.values(keyframe.bones)) {
-          if (pose.rotation !== undefined) expect(Math.abs(Number(pose.rotation.toFixed(1)) - pose.rotation)).toBe(0);
-          if (pose.x !== undefined) expect(Math.abs(Number(pose.x.toFixed(2)) - pose.x)).toBe(0);
-          if (pose.y !== undefined) expect(Math.abs(Number(pose.y.toFixed(2)) - pose.y)).toBe(0);
+      for (const pose of clip.poses) {
+        for (const value of Object.values(pose)) {
+          if (value.rotation !== undefined) expect(Math.abs(Number(value.rotation.toFixed(1)) - value.rotation)).toBe(0);
+          if (value.x !== undefined) expect(Math.abs(Number(value.x.toFixed(2)) - value.x)).toBe(0);
+          if (value.y !== undefined) expect(Math.abs(Number(value.y.toFixed(2)) - value.y)).toBe(0);
         }
       }
     }
@@ -93,26 +98,28 @@ describe("Bandai Namco motion catalog", () => {
     expect(strike.activeWindow).toEqual([5, 7]);
     expect(slash.contactTargetFrame).toBe(15);
     expect(slash.activeWindow).toEqual([14, 17]);
+    // The contact pose is read through the sampler now, because a clip no longer stores a key at
+    // every tick it passes through. It is also no longer exact: tick 6 of a 20-tick clip is
+    // phase 0.3, which falls between pose 3 and pose 4, so the captured -84.8° reads as -83.1°.
+    // That 1.7° is the measured cost of normalising the count, and the fix is not more poses —
+    // it is a duration that puts the contact tick on a pose, which a 24-tick move would.
     const clips = buildCatalog(process.cwd()).bandaiNamco;
-    expect(clips.bnrStrikeNormal.keyframes.find((frame) => frame.frame === 6)?.bones["arm-front"]?.rotation)
-      .toBe(-84.8);
-    expect(clips.bnrSwordSlashNormal.keyframes.find((frame) => frame.frame === 15)?.bones["arm-front"]?.rotation)
-      .toBe(-51.2);
+    expect(sampleClip(clips.bnrStrikeNormal, strike.contactTargetFrame!)["arm-front"]?.rotation)
+      .toBeCloseTo(-83.1, 1);
+    expect(sampleClip(clips.bnrSwordSlashNormal, slash.contactTargetFrame!)["arm-front"]?.rotation)
+      .toBeCloseTo(-51.2, 0);
   });
 
-  it("closes every approved loop seam and emits only finite poses", () => {
+  it("holds the normalised pose count, closes every loop seam, and emits only finite values", () => {
     const catalog = buildCatalog(process.cwd());
-    for (const clip of [...Object.values(catalog.bandaiNamco), ...Object.values(catalog.studies)]) {
-      if (clip.loop) {
-        expect(clip.keyframes[0].frame).toBe(0);
-        expect(clip.keyframes.at(-1)?.frame).toBe(clip.duration);
-        expect(clip.keyframes.at(-1)?.bones).toEqual(clip.keyframes[0].bones);
-      }
-      for (const keyframe of clip.keyframes) {
-        expect(keyframe.frame).toBeGreaterThanOrEqual(0);
-        expect(keyframe.frame).toBeLessThanOrEqual(clip.duration);
-        for (const pose of Object.values(keyframe.bones)) {
-          for (const value of Object.values(pose)) expect(Number.isFinite(value)).toBe(true);
+    for (const [key, clip] of Object.entries({ ...catalog.bandaiNamco, ...catalog.studies, ...catalog.authored })) {
+      // The count is the contract. A clip with a different number of poses is not a shorter
+      // clip, it is a different format, and pose i stops meaning the same thing across clips.
+      expect(clip.poses, key).toHaveLength(POSE_COUNT);
+      if (clip.loop) expect(clip.poses[POSE_INTERVALS], key).toEqual(clip.poses[0]);
+      for (const pose of clip.poses) {
+        for (const value of Object.values(pose)) {
+          for (const number of Object.values(value)) expect(Number.isFinite(number), key).toBe(true);
         }
       }
     }

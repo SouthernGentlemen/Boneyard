@@ -1,7 +1,7 @@
-import type { BonePose, Clip, Keyframe } from "../../src/clips/types.ts";
+import type { BonePose, Clip, Pose } from "../../src/clips/types.ts";
 import { jointPositions } from "./bvh-parse.ts";
 import type { Bvh, JointPoint } from "./bvh-parse.ts";
-import { roundPosition, roundRotation, simplify } from "./reduce.ts";
+import { posesFromChannels, roundRotation } from "./reduce.ts";
 
 const ROTATION_BONES = [
   "torso", "head", "arm-back", "forearm-back", "arm-front", "forearm-front",
@@ -164,24 +164,16 @@ export function retargetClip(bvh: Bvh, definition: RetargetDefinition): Clip {
       throw new Error(`${definition.key}: contact tick ${contactFrame} is outside active window ${active[0]}-${active[1]}`);
     }
   }
-  const keyframesByFrame = new Map<number, Keyframe>();
-  const put = (sampleIndex: number, bone: string, property: keyof BonePose, value: number): void => {
-    const frame = targetFrame(sampleIndex);
-    const keyframe = keyframesByFrame.get(frame) ?? { frame, bones: {} };
-    const target = keyframe.bones[bone] ?? {};
-    target[property] = property === "rotation"
-      ? roundRotation(value, definition.rotationPrecision)
-      : roundPosition(value, definition.positionPrecision);
-    keyframe.bones[bone] = target;
-    keyframesByFrame.set(frame, keyframe);
+  // The source is dense and the pose phases are fixed, so producing the clip is resampling,
+  // not selecting. Every rotation bone is written at every pose: pose `i` has to mean the whole
+  // figure at that phase, or it does not mean the same thing from one clip to the next.
+  const channels: Record<string, Partial<Record<keyof BonePose, number[]>>> = {
+    pelvis: { y: poses.map((pose) => pose.pelvis.y!) },
   };
-
-  const yValues = poses.map((pose) => pose.pelvis.y);
-  for (const index of simplify(yValues, definition.positionTolerance)) put(index, "pelvis", "y", yValues[index]);
   for (const bone of ROTATION_BONES) {
-    const values = poses.map((pose) => pose[bone].rotation!);
-    for (const index of simplify(values, definition.angleTolerance)) put(index, bone, "rotation", values[index]);
+    channels[bone] = { ...channels[bone], rotation: poses.map((pose) => pose[bone].rotation!) };
   }
+  const resampled: Pose[] = posesFromChannels(channels, definition);
 
   return {
     name: definition.key,
@@ -189,6 +181,6 @@ export function retargetClip(bvh: Bvh, definition: RetargetDefinition): Clip {
     duration,
     easing: "linear",
     note: definition.note,
-    keyframes: [...keyframesByFrame.values()].sort((a, b) => a.frame - b.frame),
+    poses: resampled,
   };
 }

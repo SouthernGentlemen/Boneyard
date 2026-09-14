@@ -136,7 +136,7 @@ export function main(argv: readonly string[]): number {
       const path = join(outDirectory, `${key}.bvh`);
       writeFileSync(path, clipToBvh(clip, catalog.rig));
       const lane = key in catalog.studies ? "study" : key in catalog.authored ? "authored" : "shipped";
-      return { key, lane, frames: clip.duration + 1, keyframes: clip.keyframes.length, path: portable(path) };
+      return { key, lane, frames: clip.duration + 1, poses: clip.poses.length, path: portable(path) };
     });
 
     const artDirectory = join(outDirectory, "art");
@@ -189,7 +189,7 @@ export function main(argv: readonly string[]): number {
     else {
       console.log(`figure: ${figure.id}${args.figure === null ? " (default)" : ""}`);
       for (const clip of clips) {
-        console.log(`${clip.key}.bvh  ${clip.frames} frames @ ${catalog.rig.contract.exchange.bvh.frameRate} FPS  ${clip.keyframes} keyframes  (${clip.lane})`);
+        console.log(`${clip.key}.bvh  ${clip.frames} frames @ ${catalog.rig.contract.exchange.bvh.frameRate} FPS  ${clip.poses} poses  (${clip.lane})`);
       }
       console.log(`exported ${clips.length} clips and ${catalog.rig.bones.length} bone art files with ${report.art.cosmetics} cosmetics / ${report.art.placements} placements (${pathCount} paths) -> ${report.out}`);
       for (const path of blendFiles) console.log(`saved ${path}`);

@@ -2,10 +2,10 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 
 import { hierarchyOrder, validateRig } from "../../src/rig/contract.ts";
-import type { Clip, Easing, Keyframe } from "../../src/clips/types.ts";
+import type { Clip, Easing } from "../../src/clips/types.ts";
 import type { Rig } from "../../src/rig/types.ts";
 export {
-  AUTHORED_CLIP_FIELDS, AUTHORED_KEY_PATTERN_SOURCE, EASINGS, KEYFRAME_FIELDS, POSE_PROPERTIES,
+  AUTHORED_CLIP_FIELDS, AUTHORED_KEY_PATTERN_SOURCE, EASINGS, POSE_PROPERTIES,
   validateAuthoredClip,
 } from "../../src/clips/authored.ts";
 export type { AuthoredClip } from "../../src/clips/authored.ts";
@@ -110,7 +110,7 @@ export function buildCatalog(root: string): MotionCatalog {
       duration: entry.duration,
       easing: entry.easing,
       note: entry.note,
-      keyframes: entry.keyframes,
+      poses: entry.poses,
     };
     origins[entry.key] = entry.derivedFrom;
   }

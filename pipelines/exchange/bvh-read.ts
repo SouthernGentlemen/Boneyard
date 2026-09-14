@@ -1,10 +1,11 @@
-import type { BonePose, Clip, Easing, Keyframe } from "../../src/clips/types.ts";
+import { POSE_INTERVALS } from "../../src/clips/types.ts";
+import type { BonePose, Clip, Easing, Pose } from "../../src/clips/types.ts";
 import { hierarchyOrder } from "../../src/rig/contract.ts";
 import { sampleClip } from "../../src/rig/sample.ts";
 import type { Rig, RigBone } from "../../src/rig/types.ts";
 import type { Bvh, BvhNode } from "../motion/bvh-parse.ts";
-import { keyframesFromChannels, roundPosition } from "../motion/reduce.ts";
-import type { Channels, ReductionOptions } from "../motion/reduce.ts";
+import { posesFromChannels, roundPosition } from "../motion/reduce.ts";
+import type { Channels, Precision } from "../motion/reduce.ts";
 
 /**
  * Reading an edited BVH back onto SVGLab's rig.
@@ -99,12 +100,12 @@ function measureFrame(ordered: readonly RigBone[], nodes: ReadonlyMap<string, Bv
 export interface ReadOptions {
   readonly loop: boolean;
   readonly easing?: Easing;
-  readonly tolerances: ReductionOptions;
+  readonly tolerances: Precision;
 }
 
 export interface ReadClip {
   readonly duration: number;
-  readonly keyframes: readonly Keyframe[];
+  readonly poses: readonly Pose[];
   readonly scale: number;
   readonly dropped: {
     readonly outOfPlaneDegrees: number;
@@ -136,8 +137,17 @@ export function bvhToClip(bvh: Bvh, rig: Rig, options: ReadOptions): ReadClip {
   }
 
   const layout = rig.contract.exchange.bvh;
-  if (Math.abs(bvh.frameTime - layout.frameTime) > 0.0001) {
-    throw new Error(`expected ${layout.frameRate} FPS (frame time ${layout.frameTime.toFixed(7)}), found ${(1 / bvh.frameTime).toFixed(3)} FPS; set the scene to ${layout.frameRate} and export again`);
+  // A fixed 60 FPS used to be the only legal frame time, because a clip was one frame per tick.
+  // Now this repository's own exports carry one frame per pose, so the header's frame time is
+  // how long a pose interval takes and varies with the clip. What still has to hold is that the
+  // file describes a whole number of 60 Hz ticks — which is what catches the real mistake, a
+  // scene left at 24 or 30 FPS, without also rejecting a legitimate thirteen-frame export.
+  if (!(bvh.frameTime > 0)) throw new Error("BVH has no positive frame time");
+  const impliedTicks = (bvh.frames.length - 1) * bvh.frameTime * layout.frameRate;
+  if (Math.abs(impliedTicks - Math.round(impliedTicks)) > 0.001) {
+    throw new Error(`${bvh.frames.length} frames at ${(1 / bvh.frameTime).toFixed(3)} FPS is `
+      + `${impliedTicks.toFixed(3)} ticks at ${layout.frameRate} Hz, which is not a whole tick count; `
+      + `set the scene to ${layout.frameRate} FPS and export again`);
   }
 
   const measured = measureFrame(ordered, nodes);
@@ -205,40 +215,35 @@ export function bvhToClip(bvh: Bvh, rig: Rig, options: ReadOptions): ReadClip {
     channels[bone.name] = properties;
   }
 
-  const duration = frameCount - 1;
+  // Length comes from the file's own header rather than its frame count, because a clip is no
+  // longer one frame per tick. `Frame Time` is seconds per frame either way, so this reads a
+  // thirteen-frame export of a twenty-tick clip and a sixty-one-frame 60 Hz file from another
+  // tool with the same arithmetic.
+  const duration = Math.round((frameCount - 1) * bvh.frameTime * rig.contract.exchange.bvh.frameRate);
   if (duration <= 0) throw new Error("BVH has no animation to read");
-  // A value exactly on the declared tolerance is authored shape, not permission to erase it.
-  // Fixed-point BVH can turn an error that was microscopically above 1° into exactly 1°; using
-  // a tiny inward epsilon preserves that corner and makes an untouched exchange read as zero.
-  const importTolerances = {
-    ...options.tolerances,
-    angleTolerance: Math.max(0, options.tolerances.angleTolerance - 1e-9),
-    positionTolerance: Math.max(0, options.tolerances.positionTolerance - 1e-9),
-  };
-  let keyframes = keyframesFromChannels(channels as Channels, importTolerances);
+  // The pose phases are fixed, so there is nothing to select: a read is a resample. The
+  // tolerances now only decide how many decimals a value keeps.
+  const poses: Pose[] = posesFromChannels(channels as Channels, options.tolerances);
   let seamDegrees = 0;
   const easing = options.easing ?? "linear";
 
   if (options.loop) {
-    const reduced: Clip = { name: "import", duration, loop: false, easing, note: "import", keyframes };
-    const first = sampleClip(reduced, 0);
-    const last = sampleClip(reduced, duration);
+    const read: Clip = { name: "import", duration, loop: false, easing, note: "import", poses };
+    const first = sampleClip(read, 0);
+    const last = sampleClip(read, duration);
     for (const bone of Object.keys(first)) {
       seamDegrees = Math.max(seamDegrees, Math.abs(
         (last[bone]?.rotation ?? 0) - (first[bone]?.rotation ?? 0),
       ));
     }
-    const closing = keyframes.find((keyframe) => keyframe.frame === duration);
-    const opening = keyframes.find((keyframe) => keyframe.frame === 0);
-    if (!opening) throw new Error("reduced BVH has no opening keyframe");
-    const bones = structuredClone(opening.bones);
-    if (closing) closing.bones = bones;
-    else keyframes = [...keyframes, { frame: duration, bones }].sort((a, b) => a.frame - b.frame);
+    // The seam is closed by construction rather than reported and left open: the last pose of a
+    // looping clip *is* its first, and the validator refuses anything else.
+    poses[POSE_INTERVALS] = structuredClone(poses[0]);
   }
 
   return {
     duration,
-    keyframes,
+    poses,
     scale: roundPosition(scale, 3),
     dropped: {
       outOfPlaneDegrees: dropped.outOfPlaneDegrees,

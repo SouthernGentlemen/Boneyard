@@ -232,8 +232,8 @@
   },
   "catalogs": {
     "catalog/clips.json": {
-      "raw": 38886,
-      "gzip": 5221
+      "raw": 41477,
+      "gzip": 5147
     },
     "figures/index.json": {
       "raw": 425,

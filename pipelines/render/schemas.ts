@@ -17,9 +17,9 @@ import {
   AUTHORED_CLIP_FIELDS,
   AUTHORED_KEY_PATTERN_SOURCE,
   EASINGS,
-  KEYFRAME_FIELDS,
   POSE_PROPERTIES,
 } from "../motion/catalog.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
 import { FIGURE_FIELDS } from "./manifest.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -31,7 +31,7 @@ function authoredClipSchema(rig: Rig): Schema {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     $id: "https://svglab.local/rigs/authored-clip.schema.json",
     title: "SVGLab authored clip",
-    description: "Authored source at 60 Hz. build:motions also checks frame order, duration bounds, loop closure, file-name agreement, provenance, and rig references.",
+    description: `Authored source at 60 Hz. Every clip holds exactly ${POSE_COUNT} poses; duration is free. build:motions also checks loop closure, file-name agreement, provenance, and rig references.`,
     type: "object",
     additionalProperties: false,
     required: [...AUTHORED_CLIP_FIELDS],
@@ -39,24 +39,19 @@ function authoredClipSchema(rig: Rig): Schema {
       key: { type: "string", pattern: AUTHORED_KEY_PATTERN_SOURCE },
       derivedFrom: { type: ["string", "null"] },
       loop: { type: "boolean" },
-      duration: { type: "integer", minimum: 1, description: "Duration in integer 60 Hz ticks." },
+      duration: { type: "integer", minimum: 1, description: "Playback length in integer 60 Hz ticks, independent of the pose count." },
       easing: { enum: [...EASINGS] },
       note: { type: "string", minLength: 1, pattern: "\\S" },
-      keyframes: {
+      poses: {
         type: "array",
-        minItems: 1,
+        minItems: POSE_COUNT,
+        maxItems: POSE_COUNT,
+        description: `Exactly ${POSE_COUNT} poses at evenly spaced phases, pose 0 to pose ${POSE_INTERVALS}.`
+          + " A looping clip's last pose is its first.",
         items: {
           type: "object",
-          additionalProperties: false,
-          required: [...KEYFRAME_FIELDS],
-          properties: {
-            frame: { type: "integer", minimum: 0 },
-            bones: {
-              type: "object",
-              propertyNames: { enum: rig.bones.map((bone) => bone.name).sort() },
-              additionalProperties: { $ref: "#/$defs/bonePose" },
-            },
-          },
+          propertyNames: { enum: rig.bones.map((bone) => bone.name).sort() },
+          additionalProperties: { $ref: "#/$defs/bonePose" },
         },
       },
     },

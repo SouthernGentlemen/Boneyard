@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://svglab.local/rigs/authored-clip.schema.json",
   "title": "SVGLab authored clip",
-  "description": "Authored source at 60 Hz. build:motions also checks frame order, duration bounds, loop closure, file-name agreement, provenance, and rig references.",
+  "description": "Authored source at 60 Hz. Every clip holds exactly 13 poses; duration is free. build:motions also checks loop closure, file-name agreement, provenance, and rig references.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -12,7 +12,7 @@
     "duration",
     "easing",
     "note",
-    "keyframes"
+    "poses"
   ],
   "properties": {
     "key": {
@@ -31,7 +31,7 @@
     "duration": {
       "type": "integer",
       "minimum": 1,
-      "description": "Duration in integer 60 Hz ticks."
+      "description": "Playback length in integer 60 Hz ticks, independent of the pose count."
     },
     "easing": {
       "enum": [
@@ -44,42 +44,30 @@
       "minLength": 1,
       "pattern": "\\S"
     },
-    "keyframes": {
+    "poses": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 13,
+      "maxItems": 13,
+      "description": "Exactly 13 poses at evenly spaced phases, pose 0 to pose 12. A looping clip's last pose is its first.",
       "items": {
         "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "frame",
-          "bones"
-        ],
-        "properties": {
-          "frame": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "bones": {
-            "type": "object",
-            "propertyNames": {
-              "enum": [
-                "arm-back",
-                "arm-front",
-                "forearm-back",
-                "forearm-front",
-                "head",
-                "leg-back",
-                "leg-front",
-                "pelvis",
-                "shin-back",
-                "shin-front",
-                "torso"
-              ]
-            },
-            "additionalProperties": {
-              "$ref": "#/$defs/bonePose"
-            }
-          }
+        "propertyNames": {
+          "enum": [
+            "arm-back",
+            "arm-front",
+            "forearm-back",
+            "forearm-front",
+            "head",
+            "leg-back",
+            "leg-front",
+            "pelvis",
+            "shin-back",
+            "shin-front",
+            "torso"
+          ]
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/bonePose"
         }
       }
     }

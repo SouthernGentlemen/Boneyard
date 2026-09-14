@@ -1,4 +1,5 @@
-import type { Clip, BonePose, Pose } from "../clips/types.ts";
+import { POSE_INTERVALS } from "../clips/types.ts";
+import type { BonePose, Clip, Pose } from "../clips/types.ts";
 
 const PROPERTIES = ["x", "y", "rotation"] as const satisfies readonly (keyof BonePose)[];
 
@@ -15,7 +16,11 @@ function clipFrame(clip: Clip, frame: number): number {
 }
 
 /**
- * The one sampler. Sparse per-property interpolation keeps the authored keyframes readable.
+ * The one sampler. A tick becomes a phase, a phase becomes a position between two poses.
+ *
+ * Because every clip holds the same number of poses at known phases, there is no search: the
+ * pair to interpolate is arithmetic. That is the whole benefit of normalising the count, and it
+ * is why this is now shorter than the sparse per-channel version it replaces.
  *
  * This module imports nothing but its own types, which is what lets a pipeline run it under
  * plain `node` and bake an export through the same code the page draws with. C2 says there is
@@ -24,37 +29,26 @@ function clipFrame(clip: Clip, frame: number): number {
  */
 export function sampleClip(clip: Clip, frame: number): Pose {
   const at = clipFrame(clip, frame);
-  const bones = new Set<string>();
-  for (const keyframe of clip.keyframes) Object.keys(keyframe.bones).forEach((bone) => bones.add(bone));
+  const position = clip.duration <= 0 ? 0 : (at / clip.duration) * POSE_INTERVALS;
+  const lower = Math.max(0, Math.min(POSE_INTERVALS, Math.floor(position)));
+  const upper = Math.min(POSE_INTERVALS, lower + 1);
+  const progress = ease(Math.max(0, Math.min(1, position - lower)), clip.easing);
+
+  const before = clip.poses[lower] ?? {};
+  const after = clip.poses[upper] ?? before;
   const pose: Pose = {};
 
-  for (const boneName of bones) {
+  for (const boneName of new Set([...Object.keys(before), ...Object.keys(after)])) {
     const bone: BonePose = {};
     for (const property of PROPERTIES) {
-      let beforeFrame = -1;
-      let beforeValue = 0;
-      let afterFrame = -1;
-      let afterValue = 0;
-      for (const keyframe of clip.keyframes) {
-        const value = keyframe.bones[boneName]?.[property];
-        if (value === undefined) continue;
-        if (keyframe.frame <= at && keyframe.frame > beforeFrame) {
-          beforeFrame = keyframe.frame;
-          beforeValue = value;
-        } else if (keyframe.frame > at && (afterFrame < 0 || keyframe.frame < afterFrame)) {
-          afterFrame = keyframe.frame;
-          afterValue = value;
-        }
-      }
-      // A channel first keyed after this tick holds its first authored value. Interpolating
-      // towards it from an implied zero invents motion nobody wrote: a torso authored as a
-      // constant 40 from tick 4 would swing 0 -> 40 across the ticks before it.
-      if (beforeFrame < 0) bone[property] = afterFrame < 0 ? 0 : afterValue;
-      else if (afterFrame < 0 || afterFrame === beforeFrame) bone[property] = beforeValue;
-      else {
-        const progress = ease((at - beforeFrame) / (afterFrame - beforeFrame), clip.easing);
-        bone[property] = beforeValue + (afterValue - beforeValue) * progress;
-      }
+      const from = before[boneName]?.[property];
+      const to = after[boneName]?.[property];
+      // A property neither pose authors stays unauthored. One that only one pose authors is
+      // held rather than eased towards an implied zero, which would invent motion nobody wrote.
+      if (from === undefined && to === undefined) continue;
+      const start = from ?? to!;
+      const end = to ?? from!;
+      bone[property] = start + (end - start) * progress;
     }
     pose[boneName] = bone;
   }

@@ -2,6 +2,7 @@ import { hierarchyOrder } from "../../src/rig/contract.ts";
 import { sampleClip } from "../../src/rig/sample.ts";
 import type { Clip } from "../../src/clips/types.ts";
 import type { Rig, RigBone } from "../../src/rig/types.ts";
+import { POSE_INTERVALS } from "../../src/clips/types.ts";
 
 /**
  * SVGLab's 2D rig as a BVH skeleton an external tool can open.
@@ -54,15 +55,28 @@ function rootChannel(name: string, pose: { x?: number; y?: number; rotation?: nu
   return 0;
 }
 
-/** Bake one frame per tick through the runtime's one sampler. */
+/**
+ * Bake one frame per pose, through the runtime's one sampler.
+ *
+ * One frame per *tick* used to be right, when a clip stored keys on ticks. It stopped being
+ * right when poses moved to phases: a pose boundary rarely lands on a whole tick, so a 60 Hz
+ * bake samples across the corner and reading it back cuts it — measured at 5.06 degrees on the
+ * twenty-tick strike, well past the one degree the exchange allows.
+ *
+ * Baking the poses themselves carries exactly the clip's information and no less, so an
+ * untouched round trip is identity rather than nearly-identity. The clip's length is not lost
+ * with the tick grid: BVH's own `Frame Time` carries it, as the seconds one pose interval takes.
+ * An animator also gets thirteen real keys to grab instead of sixty-one baked samples.
+ */
 export function clipToBvh(clip: Clip, rig: Rig): string {
   const ordered = hierarchyOrder(rig);
   const root = ordered[0];
   const layout = rig.contract.exchange.bvh;
   const frames: string[] = [];
+  const frameTime = clip.duration / (POSE_INTERVALS * layout.frameRate);
 
-  for (let frame = 0; frame <= clip.duration; frame += 1) {
-    const pose = sampleClip(clip, frame);
+  for (let index = 0; index <= POSE_INTERVALS; index += 1) {
+    const pose = sampleClip(clip, (index / POSE_INTERVALS) * clip.duration);
     const rootPose = pose[root.name] ?? {};
     const values = layout.rootChannels.map((channel) => rootChannel(channel, rootPose, rig));
     for (const bone of ordered.slice(1)) {
@@ -79,7 +93,7 @@ export function clipToBvh(clip: Clip, rig: Rig): string {
     ...hierarchy(rig),
     "MOTION",
     `Frames: ${frames.length}`,
-    `Frame Time: ${layout.frameTime.toFixed(7)}`,
+    `Frame Time: ${frameTime.toFixed(7)}`,
     ...frames,
     "",
   ].join("\n");

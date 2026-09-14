@@ -9,24 +9,28 @@ import { clipToBvh } from "../../pipelines/exchange/bvh-write.ts";
 import { checkExchange } from "../../pipelines/guards/exchange.ts";
 import { buildCatalog } from "../../pipelines/motion/catalog.ts";
 import { parseBvh } from "../../pipelines/motion/bvh-parse.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("BVH exchange", () => {
-  it("bakes the contract's hierarchy and one frame per sampler tick", () => {
+  it("bakes the contract's hierarchy and one frame per pose", () => {
     const catalog = buildCatalog(ROOT);
     const clip = catalog.bandaiNamco.bnrStrikeNormal;
     const bvh = parseBvh(clipToBvh(clip, catalog.rig), clip.name);
     const layout = catalog.rig.contract.exchange.bvh;
 
     expect(bvh.nodes.map((node) => node.name)).toEqual(catalog.rig.bones.map((bone) => bone.name));
-    expect(bvh.frameTime).toBeCloseTo(layout.frameTime, 7);
-    expect(bvh.frames).toHaveLength(clip.duration + 1);
+    // One frame per pose, and the header's frame time is how long a pose interval takes — which
+    // is what carries the clip's length now that poses sit on phases rather than ticks.
+    expect(bvh.frames).toHaveLength(POSE_COUNT);
+    expect(bvh.frameTime).toBeCloseTo(clip.duration / (POSE_INTERVALS * layout.frameRate), 7);
     expect(bvh.channelCount).toBe(layout.rootChannels.length + (catalog.rig.bones.length - 1) * layout.jointChannels.length);
 
-    for (let tick = 0; tick <= clip.duration; tick += 1) {
+    for (let index = 0; index <= POSE_INTERVALS; index += 1) {
+      const tick = (index / POSE_INTERVALS) * clip.duration;
       const pose = sampleClip(clip, tick);
-      const values = bvh.frames[tick];
+      const values = bvh.frames[index];
       expect(values[layout.rootChannels.indexOf("Yposition")]).toBeCloseTo(
         layout.rootRestHeight - (pose.pelvis?.y ?? 0), 6,
       );
@@ -49,7 +53,7 @@ describe("BVH exchange", () => {
       easing: original.easing,
       tolerances: catalog.manifest.defaults,
     });
-    const clip: Clip = { ...original, keyframes: returned.keyframes };
+    const clip: Clip = { ...original, poses: returned.poses };
     let worst = 0;
     for (let tick = 0; tick <= original.duration; tick += 1) {
       const before = sampleClip(original, tick);

@@ -47,10 +47,25 @@ listing in `fitted` the figures it actually suits).
 slot, which cosmetics are worn and which rig it targets. The art it names may come from any
 number of sheets.
 
-**C2 — One tick domain, one sampler.** Integer ticks at 60 Hz. Source at 30 fps is resampled.
-`src/rig/sample.ts` is the only interpolator, and it imports nothing but its own types so a
-browser, a pipeline and a second lab all run the same code. There is never a second
+**C2 — One tick domain, one sampler, one pose count.** Integer ticks at 60 Hz. Source at 30 fps
+is resampled. `src/rig/sample.ts` is the only interpolator, and it imports nothing but its own
+types so a browser, a pipeline and a second lab all run the same code. There is never a second
 implementation held together by a parity test — that rule is the reason this repository exists.
+
+**Every clip holds exactly thirteen poses**, at evenly spaced phases from pose 0 to pose 12.
+The poses say what the motion is; `duration` says how long it takes, and the two are independent.
+That is what makes production consistent: authoring a clip is always the same job, pose `i` of
+one clip is comparable to pose `i` of another, and retiming is a change to one number rather
+than a re-key. Twelve intervals is the classic full-animation rate — a one-second cycle is twelve
+drawings a second — and divides by two, three, four and six, so a move reads in halves, thirds
+and quarters. Sixteen would put poses less than a tick apart on anything under a third of a
+second; eight leaves a one-second cycle too thin for breakdowns.
+
+Phases are deliberately not ticks. Binding poses to whole ticks would force every duration to a
+multiple of twelve, and a fighting game needs to be able to say sixteen ticks. The cost is
+measured and real: a contact tick that does not land on a pose is interpolated, which reads the
+strike's captured -84.8° as -83.1°. The fix for that is a duration that puts the contact on a
+pose, not a larger pose count.
 
 **C3 — Generated output versus authored source.** Generated files carry a header saying so,
 rebuild byte-identically, contain no timestamps or machine paths, and have a `--check` mode that
@@ -60,17 +75,29 @@ part and cosmetic SVGs and the two authored schemas are generated and tracked.
 
 There is a third category: **derived and not shipped.** A study clip rebuilds deterministically
 and is written to `out/` on every build, where a Blender project is pointed at it, but it is not
-in the catalog C5 measures.
+in the catalog C5 measures. The reason that split existed has largely gone: the two studies were
+59,523 bytes as sparse per-tick keyframes and are 8,770 at a normalised pose count, because a
+clip's weight no longer scales with how long it is.
 
-**C4 — The exchange is measured, not assumed.** Export bakes one BVH frame per tick through the
-runtime sampler, so a file plays what the catalog holds. Import measures what it is given: the
-drawing's axes come out of the file's own offsets, the planar rotation from whichever channel
-turns about the depth those axes imply, and a uniform scale is divided back out. An untouched
-round trip changes nothing. Anything the rig cannot hold — out-of-plane rotation, depth
+**C4 — The exchange is measured, not assumed.** Export bakes **one BVH frame per pose** through
+the runtime sampler, so a file carries exactly what the catalog holds and an untouched round trip
+is identity rather than nearly-identity. One frame per *tick* was right when keys sat on ticks;
+once poses moved to phases a 60 Hz bake sampled across the corners and reading it back cut them,
+measured at 5.06° on the twenty-tick strike. The clip's length is not lost with the tick grid:
+BVH's own `Frame Time` carries it, as the seconds one pose interval takes, and an animator gets
+thirteen real keys to grab instead of sixty-one baked samples.
+
+A frame time that differs from 1/60 is therefore no longer an error — it is how a file states
+its tempo. What is still checked, because it is the mistake that actually happens, is that the
+header implies a whole number of 60 Hz ticks; a scene left at 24 FPS does not.
+
+Import measures what it is given: the drawing's axes come out of the file's own offsets, the
+planar rotation from whichever channel turns about the depth those axes imply, and a uniform
+scale is divided back out. Anything the rig cannot hold — out-of-plane rotation, depth
 translation, horizontal root travel — is measured, attributed to the bones it came from, and
-reported against the bone's own rest offset. Reduction is Douglas–Peucker per channel at 1° and
-0.15 units; rotation stores to one decimal and position to two, because one rounding rule cannot
-express two tolerances.
+reported against the bone's own rest offset. There is no Douglas–Peucker reduction any more:
+with the phases fixed there is nothing to select, so a read is a resample. Rotation stores to one
+decimal and position to two, because one rounding rule cannot express two tolerances.
 
 **C5 — The footprint is a ratchet, not a budget.** `check:footprint` records what every part,
 cosmetic, figure and generated catalog weighs and fails when a number grows. Accepting growth

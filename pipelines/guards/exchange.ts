@@ -4,6 +4,7 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { POSE_COUNT } from "../../src/clips/types.ts";
 import type { Clip } from "../../src/clips/types.ts";
 import { sampleClip } from "../../src/rig/sample.ts";
 import { bvhToClip } from "../exchange/bvh-read.ts";
@@ -56,7 +57,7 @@ export function checkExchange(): ExchangeReport {
       loop: clip.loop,
       easing: clip.easing,
       note: "round-trip guard",
-      keyframes: read.keyframes,
+      poses: read.poses,
     };
     for (let frame = 0; frame <= clip.duration; frame += 1) {
       const before = sampleClip(clip, frame);
@@ -85,8 +86,12 @@ export function checkExchange(): ExchangeReport {
   rejects("extra joint", () => bvhToClip(
     parseBvh(sample.replace("JOINT head", "JOINT tail"), "extra"), catalog.rig, readOptions,
   ));
-  rejects("wrong frame rate", () => bvhToClip(
-    parseBvh(sample.replace(/Frame Time: [\d.]+/, "Frame Time: 0.0333333"), "30fps"), catalog.rig, readOptions,
+  // A frame time that is merely *different* is no longer wrong: it is how an export says how
+  // long a pose interval takes, so thirteen frames at 30 FPS is an honest twenty-four tick clip
+  // and there is nothing in the file to contradict it. What is still detectable, and still the
+  // real mistake, is a rate that implies a fractional number of 60 Hz ticks.
+  rejects("frame time that implies a fractional tick count", () => bvhToClip(
+    parseBvh(sample.replace(/Frame Time: [\d.]+/, "Frame Time: 0.0400000"), "fractional"), catalog.rig, readOptions,
   ));
   rejects("rest offset drift", () => bvhToClip(
     parseBvh(sample.replace("OFFSET 11.000000 22.000000", "OFFSET 11.000000 30.000000"), "drift"),
@@ -114,7 +119,7 @@ export function checkExchange(): ExchangeReport {
 
   const reframed = bvhToClip(parseBvh(reframe(sample), "reframed"), catalog.rig, readOptions);
   const native = bvhToClip(parseBvh(sample, "native"), catalog.rig, readOptions);
-  check(JSON.stringify(reframed.keyframes) === JSON.stringify(native.keyframes),
+  check(JSON.stringify(reframed.poses) === JSON.stringify(native.poses),
     "the same clip in another tool's frame did not read back identically");
   check(reframed.dropped.outOfPlaneDegrees === 0, "a reframed export reported out-of-plane rotation");
 
@@ -143,7 +148,7 @@ export function checkExchange(): ExchangeReport {
   const positioned = bvhToClip(parseBvh(withJointPositions(sample), "positioned"), catalog.rig, readOptions);
   check(positioned.dropped.depthUnits === 0,
     `a joint at its own OFFSET was reported as ${positioned.dropped.depthUnits.toFixed(3)} units of dropped translation`);
-  check(JSON.stringify(positioned.keyframes) === JSON.stringify(native.keyframes),
+  check(JSON.stringify(positioned.poses) === JSON.stringify(native.poses),
     "position channels holding the rest pose changed the imported clip");
 
   const lines = sample.split("\n");
@@ -159,7 +164,7 @@ export function checkExchange(): ExchangeReport {
     "out-of-plane rotation was not measured");
   check(tiltedRead.dropped.bones.includes("pelvis"),
     "out-of-plane rotation did not name the bone it came from");
-  check(JSON.stringify(tiltedRead.keyframes) === JSON.stringify(native.keyframes),
+  check(JSON.stringify(tiltedRead.poses) === JSON.stringify(native.poses),
     "out-of-plane rotation changed the imported pose");
 
   const translated = lines.map((line, index) => {
@@ -188,10 +193,9 @@ export function checkExchange(): ExchangeReport {
     duration: 4,
     easing: "linear",
     note: "Exchange guard fixture.",
-    keyframes: [
-      { frame: 0, bones: { torso: { rotation: 0 } } },
-      { frame: 4, bones: { torso: { rotation: 9 } } },
-    ],
+    poses: Array.from({ length: POSE_COUNT }, (_unused, index) => ({
+      torso: { rotation: index * 0.75 },
+    })),
   };
   validateAuthoredClip(structuredClone(good), { rig, bandaiNamco });
   rejects("unprefixed key", () => validateAuthoredClip({ ...structuredClone(good), key: "probe" }, { rig, bandaiNamco }));
@@ -206,18 +210,21 @@ export function checkExchange(): ExchangeReport {
   ));
   rejects("unknown bone", () => validateAuthoredClip({
     ...structuredClone(good),
-    keyframes: [{ frame: 0, bones: { tail: { rotation: 0 } } }],
+    poses: Array.from({ length: POSE_COUNT }, () => ({ tail: { rotation: 0 } })),
   }, { rig, bandaiNamco }));
-  rejects("unordered keyframes", () => validateAuthoredClip({
+  rejects("too few poses", () => validateAuthoredClip({
     ...structuredClone(good),
-    keyframes: [
-      { frame: 4, bones: { torso: { rotation: 0 } } },
-      { frame: 0, bones: { torso: { rotation: 9 } } },
-    ],
+    poses: structuredClone(good).poses.slice(0, POSE_COUNT - 1),
   }, { rig, bandaiNamco }));
-  rejects("keyframe past duration", () => validateAuthoredClip({
+  rejects("too many poses", () => validateAuthoredClip({
     ...structuredClone(good),
-    keyframes: [...structuredClone(good).keyframes, { frame: 9, bones: { torso: { rotation: 1 } } }],
+    poses: [...structuredClone(good).poses, { torso: { rotation: 0 } }],
+  }, { rig, bandaiNamco }));
+  rejects("non-finite value", () => validateAuthoredClip({
+    ...structuredClone(good),
+    poses: structuredClone(good).poses.map((pose: unknown, index: number) => (
+      index === 3 ? { torso: { rotation: Number.NaN } } : pose
+    )),
   }, { rig, bandaiNamco }));
   rejects("open loop seam", () => validateAuthoredClip({ ...structuredClone(good), loop: true }, { rig, bandaiNamco }));
   rejects("file name mismatch", () => validateAuthoredClip(

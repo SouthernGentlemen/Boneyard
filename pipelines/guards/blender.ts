@@ -8,6 +8,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
 import type { Clip } from "../../src/clips/types.ts";
 import { forwardKinematics } from "../../src/rig/fk.ts";
 import { sampleClip } from "../../src/rig/sample.ts";
@@ -58,7 +59,7 @@ function roundTripDeviation(original: Clip, returned: ReturnType<typeof bvhToCli
     duration: returned.duration,
     easing: original.easing,
     note: "real Blender export",
-    keyframes: returned.keyframes,
+    poses: returned.poses,
   };
   let rotation = 0;
   let position = 0;
@@ -103,25 +104,29 @@ function runBlender(executable: string): BlenderReport {
     const worst: Worst = { deviation: 0, clip: "", tick: 0, bone: "" };
     let comparisons = 0;
     for (const [key, clip] of Object.entries(clips)) {
+      // A Blender frame is a pose now, not a tick: the export carries one frame per pose and the
+      // scene's frame time says how long a pose interval lasts. So the comparison walks poses and
+      // asks the sampler for the tick each one sits at.
       const frames = actual[key];
-      if (!frames || frames.length !== clip.duration + 1) {
-        throw new Error(`${key}: Blender returned ${frames?.length ?? 0} frames, expected ${clip.duration + 1}`);
+      if (!frames || frames.length !== POSE_COUNT) {
+        throw new Error(`${key}: Blender returned ${frames?.length ?? 0} frames, expected ${POSE_COUNT}`);
       }
-      for (let tick = 0; tick <= clip.duration; tick += 1) {
+      for (let index = 0; index <= POSE_INTERVALS; index += 1) {
+        const tick = (index / POSE_INTERVALS) * clip.duration;
         const expected = forwardKinematics(catalog.rig, sampleClip(clip, tick));
-        const points = frames[tick];
+        const points = frames[index];
         for (const bone of catalog.rig.bones) {
           const point = points[bone.name];
-          if (!point) throw new Error(`${key} tick ${tick}: Blender returned no '${bone.name}' joint`);
+          if (!point) throw new Error(`${key} pose ${index}: Blender returned no '${bone.name}' joint`);
           const target = expected.get(bone.name)!;
           const deviation = Math.hypot(point[0] - target.x, point[1] - target.y);
           comparisons += 1;
-          if (deviation > worst.deviation) Object.assign(worst, { deviation, clip: key, tick, bone: bone.name });
+          if (deviation > worst.deviation) Object.assign(worst, { deviation, clip: key, tick: index, bone: bone.name });
         }
       }
     }
     if (worst.deviation > LIMIT) {
-      throw new Error(`${worst.clip} tick ${worst.tick} ${worst.bone}: Blender joint drift ${worst.deviation} exceeds ${LIMIT}`);
+      throw new Error(`${worst.clip} pose ${worst.tick} ${worst.bone}: Blender joint drift ${worst.deviation} exceeds ${LIMIT}`);
     }
 
     const original = clips[ROUND_TRIP_CLIP];
@@ -184,7 +189,7 @@ export function main(argv: readonly string[]): number {
     if (asJson) console.log(JSON.stringify(report, null, 2));
     else {
       console.log(`check:blender: Blender ${report.version}; ${report.comparisons.toLocaleString("en-US")} joint comparisons across ${report.clips} clips`);
-      console.log(`check:blender: worst ${report.worst.deviation.toExponential(3)} units at ${report.worst.clip} tick ${report.worst.tick}, ${report.worst.bone} (limit ${LIMIT})`);
+      console.log(`check:blender: worst ${report.worst.deviation.toExponential(3)} units at ${report.worst.clip} pose ${report.worst.tick}, ${report.worst.bone} (limit ${LIMIT})`);
       console.log(`check:blender: real BVH export ${report.roundTrip.rotation.toFixed(4)}° / ${report.roundTrip.position.toFixed(4)} units; ${report.seconds.toFixed(2)} s`);
     }
     return 0;

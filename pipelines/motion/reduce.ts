@@ -1,4 +1,5 @@
-import type { BonePose, Keyframe } from "../../src/clips/types.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
+import type { BonePose, Pose } from "../../src/clips/types.ts";
 import { sampleClip } from "../../src/rig/sample.ts";
 
 /**
@@ -9,87 +10,90 @@ import { sampleClip } from "../../src/rig/sample.ts";
  * than a copy of it — node runs the TypeScript directly. The copy that used to live here was
  * linear-only and silently disagreed with the runtime by 8.6 degrees on a smoothstep clip,
  * which is the failure a parity test is supposed to prevent and cannot.
+ *
+ * What used to live here as well was Douglas-Peucker reduction, which chose *which* frames to
+ * keep. Under a normalised pose count there is nothing to choose: the phases are fixed, so
+ * producing a clip is resampling, not selecting. The tolerances that drove the reduction now
+ * only decide how many decimals a value is stored to.
  */
 export { sampleClip };
 
+// `|| 0` is not redundant: rounding a small negative lands on -0, which is not +0 under
+// Object.is, so a loop seam copied from pose 0 would compare unequal to pose 0.
 export const roundRotation = (value: number, places = 1): number => (
-  Math.round(value * 10 ** places) / 10 ** places
+  Math.round(value * 10 ** places) / 10 ** places || 0
 );
 
 export const roundPosition = (value: number, places = 2): number => (
-  Math.round(value * 10 ** places) / 10 ** places
+  Math.round(value * 10 ** places) / 10 ** places || 0
 );
 
 export const PROPERTIES = ["x", "y", "rotation"] as const satisfies readonly (keyof BonePose)[];
 
-/** Douglas-Peucker over one channel: keep only the samples a linear reading would miss. */
-export function simplify(values: readonly number[], tolerance: number): number[] {
-  const keep = new Set([0, values.length - 1]);
-  const visit = (start: number, end: number): void => {
-    if (end - start < 2) return;
-    let largestError = -1;
-    let largestIndex = -1;
-    for (let index = start + 1; index < end; index += 1) {
-      const progress = (index - start) / (end - start);
-      const interpolated = values[start] + (values[end] - values[start]) * progress;
-      const error = Math.abs(values[index] - interpolated);
-      if (error > largestError) {
-        largestError = error;
-        largestIndex = index;
-      }
-    }
-    if (largestError > tolerance) {
-      keep.add(largestIndex);
-      visit(start, largestIndex);
-      visit(largestIndex, end);
-    }
-  };
-  visit(0, values.length - 1);
-  return [...keep].sort((a, b) => a - b);
-}
-
-export type Channels = Readonly<Record<string, Partial<Record<keyof BonePose, readonly number[]>>>>;
-
-export interface ReductionOptions {
-  readonly angleTolerance: number;
-  readonly positionTolerance: number;
+export interface Precision {
   readonly rotationPrecision: number;
   readonly positionPrecision: number;
 }
 
-/**
- * Turns dense per-frame channels back into the sparse keyframes the lab ships.
- *
- * `channels` is `{ [bone]: { [property]: number[] } }` with one value per frame. Channels that
- * never move keep their first sample only, so a clip that touches four bones stays a clip that
- * touches four bones after a round trip through a tool that writes every bone every frame.
- */
-export function keyframesFromChannels(channels: Channels, tolerances: ReductionOptions): Keyframe[] {
-  const byFrame = new Map<number, Keyframe>();
-  const put = (frame: number, bone: string, property: keyof BonePose, value: number): void => {
-    const keyframe = byFrame.get(frame) ?? { frame, bones: {} };
-    const rounded = property === "rotation"
-      ? roundRotation(value, tolerances.rotationPrecision)
-      : roundPosition(value, tolerances.positionPrecision);
-    keyframe.bones[bone] = { ...keyframe.bones[bone], [property]: rounded };
-    byFrame.set(frame, keyframe);
-  };
+const round = (property: keyof BonePose, value: number, precision: Precision): number => (
+  property === "rotation"
+    ? roundRotation(value, precision.rotationPrecision)
+    : roundPosition(value, precision.positionPrecision)
+);
 
-  for (const [bone, properties] of Object.entries(channels)) {
-    for (const [propertyName, values] of Object.entries(properties)) {
-      const property = propertyName as keyof BonePose;
-      const tolerance = property === "rotation" ? tolerances.angleTolerance : tolerances.positionTolerance;
-      const span = Math.max(...values) - Math.min(...values);
-      if (span <= tolerance) {
-        const nonzero = values.some((value) => property === "rotation"
-          ? roundRotation(value, tolerances.rotationPrecision) !== 0
-          : roundPosition(value, tolerances.positionPrecision) !== 0);
-        if (nonzero) put(0, bone, property, values[0]);
-        continue;
+/**
+ * One dense channel read at a fractional index, linearly.
+ *
+ * A pose's phase rarely lands on a whole source sample, and rounding to the nearest one would
+ * quantise the whole clip to the source's frame rate. Reading between them keeps the timing the
+ * capture actually had.
+ */
+export function sampleChannel(values: readonly number[], position: number): number {
+  if (values.length === 0) return 0;
+  const clamped = Math.max(0, Math.min(values.length - 1, position));
+  const lower = Math.floor(clamped);
+  const upper = Math.min(values.length - 1, lower + 1);
+  return values[lower] + (values[upper] - values[lower]) * (clamped - lower);
+}
+
+export type Channels = Readonly<Record<string, Partial<Record<keyof BonePose, readonly number[]>>>>;
+
+/**
+ * Dense per-sample channels become the fixed pose count.
+ *
+ * `channels` is `{ [bone]: { [property]: number[] } }` with one value per source sample, in
+ * order. Every channel present is written at every pose: under a normalised count a pose is the
+ * whole state of the figure at that phase, and a channel that appears in some poses and not
+ * others would make pose `i` mean something different from clip to clip.
+ */
+export function posesFromChannels(channels: Channels, precision: Precision): Pose[] {
+  return Array.from({ length: POSE_COUNT }, (_unused, index) => {
+    const pose: Pose = {};
+    for (const [bone, properties] of Object.entries(channels)) {
+      const value: BonePose = {};
+      for (const [propertyName, values] of Object.entries(properties)) {
+        if (!values || values.length === 0) continue;
+        const property = propertyName as keyof BonePose;
+        const position = (index / POSE_INTERVALS) * (values.length - 1);
+        value[property] = round(property, sampleChannel(values, position), precision);
       }
-      for (const index of simplify(values, tolerance)) put(index, bone, property, values[index]);
+      if (Object.keys(value).length > 0) pose[bone] = value;
+    }
+    return pose;
+  });
+}
+
+/** The same resampling, from poses rather than channels — what an already-built clip needs. */
+export function posesFromDense(dense: readonly Pose[], precision: Precision): Pose[] {
+  const channels: Record<string, Partial<Record<keyof BonePose, number[]>>> = {};
+  for (const pose of dense) {
+    for (const [bone, value] of Object.entries(pose)) {
+      const target = channels[bone] ?? (channels[bone] = {});
+      for (const property of PROPERTIES) {
+        if (value[property] === undefined) continue;
+        (target[property] ?? (target[property] = [])).push(value[property]!);
+      }
     }
   }
-
-  return [...byFrame.values()].sort((a, b) => a.frame - b.frame);
+  return posesFromChannels(channels, precision);
 }

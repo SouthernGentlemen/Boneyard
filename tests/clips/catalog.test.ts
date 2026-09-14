@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
 
 import { buildCatalog, validateAuthoredClip } from "../../pipelines/motion/catalog.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "../../src/clips/types.ts";
 
 const loop = {
   key: "labProbe",
@@ -12,28 +13,26 @@ const loop = {
   duration: 2,
   easing: "linear",
   note: "Authored validation probe.",
-  keyframes: [
-    { frame: 0, bones: { torso: { rotation: 1 } } },
-    { frame: 2, bones: { torso: { rotation: 1 } } },
-  ],
-} as const;
+  poses: Array.from({ length: POSE_COUNT }, () => ({ torso: { rotation: 1 } })),
+};
 
 describe("authored clip lane", () => {
-  it("validates provenance, bone names, frame order and loop seams", () => {
+  it("validates provenance, bone names, the pose count and loop seams", () => {
     const catalog = buildCatalog(process.cwd());
     expect(validateAuthoredClip(loop, { rig: catalog.rig })).toEqual(loop);
     expect(() => validateAuthoredClip({ ...loop, key: "bnrProbe", derivedFrom: null }))
       .toThrow("a bnr* clip must name the clip it was derived from");
-    expect(() => validateAuthoredClip({ ...loop, keyframes: [
-      { frame: 0, bones: { unknown: { rotation: 1 } } },
-      { frame: 2, bones: { unknown: { rotation: 1 } } },
-    ] }, { rig: catalog.rig })).toThrow("poses unknown bone 'unknown'");
-    expect(() => validateAuthoredClip({ ...loop, keyframes: [...loop.keyframes].reverse() }))
-      .toThrow("out of order");
-    expect(() => validateAuthoredClip({ ...loop, keyframes: [
-      loop.keyframes[0],
-      { frame: 2, bones: { torso: { rotation: 2 } } },
-    ] })).toThrow("loop seam does not close");
+    expect(() => validateAuthoredClip({
+      ...loop,
+      poses: Array.from({ length: POSE_COUNT }, () => ({ unknown: { rotation: 1 } })),
+    }, { rig: catalog.rig })).toThrow("poses unknown bone 'unknown'");
+    // The count is the format, so a clip that is one pose short is refused rather than padded.
+    expect(() => validateAuthoredClip({ ...loop, poses: loop.poses.slice(1) }))
+      .toThrow(`has ${POSE_COUNT - 1} poses; every clip has exactly ${POSE_COUNT}`);
+    expect(() => validateAuthoredClip({
+      ...loop,
+      poses: loop.poses.map((pose, index) => (index === POSE_INTERVALS ? { torso: { rotation: 2 } } : pose)),
+    })).toThrow("loop seam does not close");
   });
 
   it("lets authored source override a shipped key without replacing its derivation", () => {
@@ -50,10 +49,7 @@ describe("authored clip lane", () => {
         duration: 60,
         easing: "linear",
         note: "Authored override probe.",
-        keyframes: [
-          { frame: 0, bones: { torso: { rotation: 1 } } },
-          { frame: 60, bones: { torso: { rotation: 1 } } },
-        ],
+        poses: Array.from({ length: POSE_COUNT }, () => ({ torso: { rotation: 1 } })),
       }));
 
       const catalog = buildCatalog(root);

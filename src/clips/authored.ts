@@ -6,14 +6,14 @@
  * a different and much better property than an editor that validates with rules resembling it.
  */
 
-import type { Clip, Easing, Keyframe } from "./types.ts";
+import { POSE_COUNT, POSE_INTERVALS } from "./types.ts";
+import type { Easing, Pose } from "./types.ts";
 import type { Rig } from "../rig/types.ts";
 
 export const EASINGS = ["linear", "smoothstep"] as const;
 export const AUTHORED_KEY_PATTERN_SOURCE = "^(bnr|lab)[A-Za-z0-9]+$";
 export const POSE_PROPERTIES = ["x", "y", "rotation"] as const;
-export const AUTHORED_CLIP_FIELDS = ["key", "derivedFrom", "loop", "duration", "easing", "note", "keyframes"] as const;
-export const KEYFRAME_FIELDS = ["frame", "bones"] as const;
+export const AUTHORED_CLIP_FIELDS = ["key", "derivedFrom", "loop", "duration", "easing", "note", "poses"] as const;
 
 export interface AuthoredClip {
   readonly key: string;
@@ -22,12 +22,12 @@ export interface AuthoredClip {
   readonly duration: number;
   readonly easing: Easing;
   readonly note: string;
-  readonly keyframes: readonly Keyframe[];
+  readonly poses: readonly Pose[];
 }
 
 export function validateAuthoredClip(
   value: unknown,
-  context: { file?: string; rig?: Rig; bandaiNamco?: Readonly<Record<string, Clip>> } = {},
+  context: { file?: string; rig?: Rig; bandaiNamco?: Readonly<Record<string, unknown>> } = {},
 ): AuthoredClip {
   const candidate = value as Partial<AuthoredClip> | null;
   const label = context.file ?? candidate?.key ?? "authored clip";
@@ -60,41 +60,34 @@ export function validateAuthoredClip(
   }
   if (!EASINGS.includes(candidate.easing as Easing)) fail(`easing must be one of ${EASINGS.join(", ")}`);
   if (typeof candidate.note !== "string" || candidate.note.trim() === "") fail("note must say what this clip is");
-  if (!Array.isArray(candidate.keyframes) || candidate.keyframes.length === 0) fail("has no keyframes");
 
-  let previous = -1;
-  for (const keyframe of candidate.keyframes) {
-    if (typeof keyframe !== "object" || keyframe === null || Array.isArray(keyframe)) fail("has a keyframe that is not an object");
-    const unknownKeyframe = Object.keys(keyframe).filter((field) => !(KEYFRAME_FIELDS as readonly string[]).includes(field));
-    if (unknownKeyframe.length > 0) fail(`keyframe has unknown fields: ${unknownKeyframe.join(", ")}`);
-    if (!Number.isInteger(keyframe.frame)) fail("keyframe frames must be whole ticks");
-    if (keyframe.frame <= previous) fail(`keyframe ${keyframe.frame} is out of order`);
-    if (keyframe.frame < 0 || keyframe.frame > candidate.duration!) {
-      fail(`keyframe ${keyframe.frame} is outside 0-${candidate.duration}`);
-    }
-    previous = keyframe.frame;
-    if (!keyframe.bones || typeof keyframe.bones !== "object" || Array.isArray(keyframe.bones)) {
-      fail(`keyframe ${keyframe.frame} has no bones`);
-    }
-    for (const [bone, pose] of Object.entries(keyframe.bones)) {
-      if (context.rig && !context.rig.byName.has(bone)) fail(`keyframe ${keyframe.frame} poses unknown bone '${bone}'`);
-      if (typeof pose !== "object" || pose === null || Array.isArray(pose)) fail(`keyframe ${keyframe.frame} has invalid pose for '${bone}'`);
-      for (const [property, propertyValue] of Object.entries(pose as Record<string, unknown>)) {
-        if (!(POSE_PROPERTIES as readonly string[]).includes(property)) {
-          fail(`keyframe ${keyframe.frame} sets unknown property '${property}'`);
-        }
-        if (!Number.isFinite(propertyValue)) {
-          fail(`keyframe ${keyframe.frame} sets ${bone}.${property} to a non-finite value`);
-        }
-      }
-    }
+  // The normalised count is the contract, so it is checked structurally rather than described.
+  // A clip with a different number of poses is not a shorter clip; it is a different format.
+  if (!Array.isArray(candidate.poses)) fail("has no poses");
+  if (candidate.poses.length !== POSE_COUNT) {
+    fail(`has ${candidate.poses.length} poses; every clip has exactly ${POSE_COUNT} `
+      + `(${POSE_INTERVALS} intervals, pose 0 to pose ${POSE_INTERVALS})`);
   }
 
-  if (candidate.keyframes[0].frame !== 0) fail("must start at tick 0");
-  if (candidate.loop) {
-    const last = candidate.keyframes.at(-1)!;
-    if (last.frame !== candidate.duration) fail("a looping clip must key its closing tick");
-    if (JSON.stringify(last.bones) !== JSON.stringify(candidate.keyframes[0].bones)) fail("loop seam does not close");
+  candidate.poses.forEach((pose, index) => {
+    if (typeof pose !== "object" || pose === null || Array.isArray(pose)) fail(`pose ${index} is not an object`);
+    for (const [bone, value] of Object.entries(pose)) {
+      if (context.rig && !context.rig.byName.has(bone)) fail(`pose ${index} poses unknown bone '${bone}'`);
+      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        fail(`pose ${index} has an invalid value for '${bone}'`);
+      }
+      for (const [property, number] of Object.entries(value as Record<string, unknown>)) {
+        if (!(POSE_PROPERTIES as readonly string[]).includes(property)) {
+          fail(`pose ${index} sets unknown property '${property}'`);
+        }
+        if (!Number.isFinite(number)) fail(`pose ${index} sets ${bone}.${property} to a non-finite value`);
+      }
+    }
+  });
+
+  if (candidate.loop
+    && JSON.stringify(candidate.poses[POSE_INTERVALS]) !== JSON.stringify(candidate.poses[0])) {
+    fail(`loop seam does not close: pose ${POSE_INTERVALS} must equal pose 0`);
   }
   return candidate as AuthoredClip;
 }
