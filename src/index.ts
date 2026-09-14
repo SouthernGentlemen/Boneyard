@@ -6,6 +6,8 @@
  * way instead of holding two implementations together with a parity test.
  */
 
+export { validateAuthoredClip, AUTHORED_CLIP_FIELDS, AUTHORED_KEY_PATTERN_SOURCE, EASINGS, KEYFRAME_FIELDS, POSE_PROPERTIES } from "./clips/authored.ts";
+export type { AuthoredClip } from "./clips/authored.ts";
 export { SUPPORTED_CONTRACT, validateRig, hasAnchor, anchorPoint, hierarchyOrder } from "./rig/contract.ts";
 export { forwardKinematics, inBone } from "./rig/fk.ts";
 export type { Placed } from "./rig/fk.ts";
