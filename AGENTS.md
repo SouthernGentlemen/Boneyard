@@ -12,6 +12,44 @@ disagree, one of them is a bug — say which.
 adopting the WizardGang development process. Its first open task has priority over new asset
 work unless the owner explicitly changes priority; completed tasks belong in Git/GitHub.
 
+## Controlled work
+
+Prospective controlled changes use permanent IDs `BY-NNN`, starting with `BY-001`. Do not
+retrofit IDs onto older history. An active task owns exactly one controlled branch and delivery:
+
+- branch: `by-NNN-kebab-case-summary`;
+- controlled commit and PR title: `[BY-NNN] [TYPE] Imperative summary`, using the task's declared
+  type and ID;
+- controlled commit body: identify `Task: BY-NNN`, summarize the narrow scope, and record the
+  validation actually run;
+- PR body: identify the task and scope, record validation, describe the provider state or actions
+  truthfully, and name the next-task handoff. Never claim a CI check, protection, release,
+  deployment or other provider capability that was not observed.
+
+`do needful` means re-fetch authoritative `main`, open PRs and current provider state before
+editing. If a current, authoritative PR already delivers the first open task, finish that PR
+rather than starting duplicate work. Otherwise take only the first open task in
+`IMPLEMENTATION_PLAN.md`. If that task is blocked, report the exact blocker and stop; do not skip
+ahead without owner direction. Unrelated PRs are not substitutes for the queue task.
+
+One task is one delivery: branch from current `main`, implement only that task, run its required
+local validation, inspect the exact PR head and provider rules/checks that actually exist, merge
+only when the PR is current and mergeable under those rules, and confirm the resulting `main`.
+The delivering change removes its own task from `IMPLEMENTATION_PLAN.md`; completed task text does
+not survive as a plan-history log.
+
+When the final queued task is delivered, delete `IMPLEMENTATION_PLAN.md` in that same delivery
+instead of leaving an exhausted placeholder. The next `do needful` then enters fresh planning
+mode: re-audit current repository and provider state and publish a new prospective queue before
+implementation work resumes.
+
+End every controlled-work turn after that one delivery. Return a complete kickoff prompt for the
+new first open task, or a fresh-planning kickoff when the queue is exhausted. Do not begin the
+next task in the same turn.
+
+Boneyard remains an asset/data library throughout this process. Controlled-work parity does not
+invent `npm run dev`, a browser application, a server, a Worker or a production deployment.
+
 ## What lives here, and why the line is where it is
 
 **A pipeline lives here if it reads or writes the asset directories.** That is the whole rule.
