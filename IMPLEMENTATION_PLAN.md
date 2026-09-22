@@ -6,16 +6,6 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-003 — [DOCS] Add contributor and capability guidance
-
-- Dependency: BY-002 merged.
-- Why: No root `CONTRIBUTING.md` explains the controlled process or why `dev` and hosted deploy are N/A while `build`/`verify` are meaningful.
-- Scope: Add concise branch/PR, command, generated-output, attribution and release-capability guidance; keep `LICENSE.md` as the explicit license/index authority.
-- Non-goals: No npm or source change.
-- Acceptance: A contributor knows how to validate a data-library change without inventing a server or production environment.
-- Validation: Review package scripts and links; `npm run verify`; `git diff --check`.
-- Authorities: `CONTRIBUTING.md`, `README.md`, `LICENSE.md`.
-
 ### BY-004 — [SEC] Establish private vulnerability reporting
 
 - Dependency: BY-003 merged.
