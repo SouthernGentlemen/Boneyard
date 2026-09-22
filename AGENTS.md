@@ -177,5 +177,9 @@ npm run check    # canonical full acceptance: every gate, typecheck, tests
 
 `npm run verify` is a temporary compatibility alias for `npm run check`; it must not own or duplicate gates.
 
+The repository toolchain is Node 24.21.0 with npm 11.19.0. `.node-version` is the Node authority,
+`package.json` pins the package manager and exact engines, and `.npmrc` rejects unsupported
+runtime versions. Use that pair before `npm ci` or any acceptance command.
+
 Reset and teardown may delete `out/` only. Never authored source, never a `.blend` someone is
 editing.

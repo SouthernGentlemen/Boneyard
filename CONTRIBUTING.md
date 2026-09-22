@@ -23,10 +23,24 @@ Use the task's declared ID and type:
 The delivering change removes its own task from the active plan. After merge, confirm the accepted
 `main` and stop; do not begin the next task in the same turn.
 
+## Toolchain and locked install
+
+Use Node 24.21.0 with npm 11.19.0. `.node-version` is the Node authority and `package.json` pins
+both the exact npm package manager and supported engine versions. `.npmrc` enables strict engine
+checking, so an unsupported Node/npm pair is rejected instead of becoming accidental local state.
+
+Install from the committed lockfile with:
+
+```bash
+npm ci
+```
+
+Do not use an install command that rewrites dependency resolution as part of normal acceptance.
+
 ## Commands and generated output
 
-Install the repository's development dependencies, then use the existing package scripts for the
-change being made. The two broad library commands are:
+After the locked install, use the existing package scripts for the change being made. The two
+broad library commands are:
 
 ```bash
 npm run build

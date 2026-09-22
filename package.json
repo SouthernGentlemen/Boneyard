@@ -4,6 +4,11 @@
   "private": true,
   "description": "The rig, the art and the motion. One source of truth, consumed by every lab.",
   "type": "module",
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": "24.21.0",
+    "npm": "11.19.0"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./paths": "./src/paths.ts",
