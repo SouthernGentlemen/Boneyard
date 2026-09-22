@@ -6,16 +6,6 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-004 — [SEC] Establish private vulnerability reporting
-
-- Dependency: BY-003 merged.
-- Why: Root `SECURITY.md` is missing despite distributed asset provenance and executable pipelines.
-- Scope: Add a private reporting route and rules for credentials, source assets, restricted media and generated/export artifacts; preserve the attribution model.
-- Non-goals: No license rewrite, hosted endpoint or certification claim.
-- Acceptance: A reporter and contributor have an explicit security/data boundary.
-- Validation: Policy/link review; `npm run verify`; `git diff --check`.
-- Authorities: `SECURITY.md`, `LICENSE.md`, `.gitignore`.
-
 ### BY-005 — [TEST] Validate prospective BY change history
 
 - Dependency: BY-004 merged.
