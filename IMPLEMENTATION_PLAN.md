@@ -6,19 +6,9 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-007 — [BUILD] Pin the Node/npm toolchain for repeatable pipelines
-
-- Dependency: none; first open task.
-- Why: The package has no `.node-version`, `packageManager` or engine policy even though native TypeScript pipeline behavior depends on Node.
-- Scope: Pin a compatible tested Node/npm pair and locked-install policy; document the version without forcing the architecture reference stack's unrelated browser/Worker dependencies.
-- Non-goals: No dependency upgrade or generated asset change unless the new pinned toolchain proves it necessary.
-- Acceptance: Local/CI setup resolves the same supported toolchain and `npm ci` uses the committed lockfile.
-- Validation: `npm ci` with pinned versions; `npm run check`; `git diff --check`.
-- Authorities: `package.json`, package lock, `.node-version`, `.npmrc`.
-
 ### BY-008 — [BUILD] Run canonical acceptance in PR and `main` CI
 
-- Dependency: BY-007 merged.
+- Dependency: none; first open task.
 - Why: The library has no CI even though FightLab consumes its exact commit and digest.
 - Scope: Add PR/main workflow using the pinned toolchain, `npm ci`, `npm run check` and bounded failure output; keep Blender tooling explicit rather than silently skipping a required assertion.
 - Non-goals: No publishing or deploy workflow.

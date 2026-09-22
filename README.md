@@ -30,8 +30,10 @@ whole reason the code ships with the data instead of being copied beside it.
 
 ## Run the pipelines
 
+Use Node 24.21.0 with npm 11.19.0, as pinned by `.node-version` and `package.json`.
+
 ```bash
-npm install
+npm ci
 npm run build                            # parts, cosmetics, catalog and indexes
 npm run render:figure -- --figure yuliya # an assembled review sheet in out/render/
 npm run render:clip -- --clip labWave    # a motion contact sheet
