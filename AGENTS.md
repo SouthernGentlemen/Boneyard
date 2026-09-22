@@ -26,6 +26,11 @@ retrofit IDs onto older history. An active task owns exactly one controlled bran
   truthfully, and name the next-task handoff. Never claim a CI check, protection, release,
   deployment or other provider capability that was not observed.
 
+Controlled `TYPE` is one of `BUILD`, `DOCS`, `FIX`, `OPS`, `REFACTOR`, `SEC` or `TEST`.
+`BY-001` is the sole bootstrap exception to the permanent body-field rule. `BY-002` and later
+controlled commits require exactly one non-empty `Task:`, `Scope:` and `Validation:` field, and
+`Task:` must repeat the title ID.
+
 `do needful` means re-fetch authoritative `main`, open PRs and current provider state before
 editing. If a current, authoritative PR already delivers the first open task, finish that PR
 rather than starting duplicate work. Otherwise take only the first open task in

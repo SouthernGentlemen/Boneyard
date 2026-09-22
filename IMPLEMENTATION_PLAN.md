@@ -6,16 +6,6 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-005 — [TEST] Validate prospective BY change history
-
-- Dependency: BY-004 merged.
-- Why: Future changes have no machine-checked permanent identity, while earlier unnumbered history must remain untouched.
-- Scope: Validate BY-001 onward for sequential unique IDs, controlled title/type and required body fields; add focused valid/invalid cases.
-- Non-goals: No old-commit rewrite or forced merge policy.
-- Acceptance: New malformed or duplicate IDs fail without treating old history as fabricated controlled records.
-- Validation: Focused history tests; `npm run verify`; `git diff --check`.
-- Authorities: `AGENTS.md`, new validator.
-
 ### BY-006 — [BUILD] Expose full asset acceptance as `npm run check`
 
 - Dependency: BY-005 merged.
