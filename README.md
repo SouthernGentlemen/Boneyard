@@ -40,6 +40,9 @@ npm run render:clip -- --clip labWave    # a motion contact sheet
 npm run check                            # canonical full acceptance: every gate, typecheck and tests
 ```
 
+Pull requests targeting `main` and pushes to `main` run that same gate in GitHub Actions after
+the pinned toolchain, locked `npm ci` install and required Blender setup.
+
 ## Guides
 
 - [Security policy](SECURITY.md) — private vulnerability reporting and sensitive-data handling.

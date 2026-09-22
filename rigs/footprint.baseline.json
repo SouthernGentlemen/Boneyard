@@ -7,11 +7,11 @@
     },
     "characters/barst/parts/arm_lower_r.svg": {
       "raw": 3641,
-      "gzip": 1243
+      "gzip": 1245
     },
     "characters/barst/parts/arm_upper_l.svg": {
       "raw": 2478,
-      "gzip": 859
+      "gzip": 860
     },
     "characters/barst/parts/arm_upper_r.svg": {
       "raw": 2911,
@@ -23,7 +23,7 @@
     },
     "characters/barst/parts/leg_lower_l.svg": {
       "raw": 1609,
-      "gzip": 593
+      "gzip": 599
     },
     "characters/barst/parts/leg_lower_r.svg": {
       "raw": 2170,
@@ -31,15 +31,15 @@
     },
     "characters/barst/parts/leg_upper_l.svg": {
       "raw": 1949,
-      "gzip": 670
+      "gzip": 671
     },
     "characters/barst/parts/leg_upper_r.svg": {
       "raw": 2123,
-      "gzip": 764
+      "gzip": 767
     },
     "characters/barst/parts/pelvis.svg": {
       "raw": 1519,
-      "gzip": 580
+      "gzip": 583
     },
     "characters/barst/parts/torso.svg": {
       "raw": 9259,
@@ -63,23 +63,23 @@
     },
     "characters/fighter/parts/head.svg": {
       "raw": 241,
-      "gzip": 180
+      "gzip": 182
     },
     "characters/fighter/parts/leg_lower_l.svg": {
       "raw": 138,
-      "gzip": 143
+      "gzip": 144
     },
     "characters/fighter/parts/leg_lower_r.svg": {
       "raw": 128,
-      "gzip": 137
+      "gzip": 138
     },
     "characters/fighter/parts/leg_upper_l.svg": {
       "raw": 135,
-      "gzip": 139
+      "gzip": 140
     },
     "characters/fighter/parts/leg_upper_r.svg": {
       "raw": 125,
-      "gzip": 131
+      "gzip": 133
     },
     "characters/fighter/parts/pelvis.svg": {
       "raw": 136,
@@ -87,7 +87,7 @@
     },
     "characters/fighter/parts/torso.svg": {
       "raw": 166,
-      "gzip": 150
+      "gzip": 151
     },
     "characters/kiran/parts/arm_lower_l.svg": {
       "raw": 4991,
@@ -95,15 +95,15 @@
     },
     "characters/kiran/parts/arm_lower_r.svg": {
       "raw": 3926,
-      "gzip": 1339
+      "gzip": 1340
     },
     "characters/kiran/parts/arm_upper_l.svg": {
       "raw": 2436,
-      "gzip": 882
+      "gzip": 884
     },
     "characters/kiran/parts/arm_upper_r.svg": {
       "raw": 1451,
-      "gzip": 556
+      "gzip": 557
     },
     "characters/kiran/parts/head.svg": {
       "raw": 37825,
@@ -111,7 +111,7 @@
     },
     "characters/kiran/parts/leg_lower_l.svg": {
       "raw": 2395,
-      "gzip": 887
+      "gzip": 894
     },
     "characters/kiran/parts/leg_lower_r.svg": {
       "raw": 2299,
@@ -119,7 +119,7 @@
     },
     "characters/kiran/parts/leg_upper_l.svg": {
       "raw": 1770,
-      "gzip": 638
+      "gzip": 640
     },
     "characters/kiran/parts/leg_upper_r.svg": {
       "raw": 2304,
@@ -127,7 +127,7 @@
     },
     "characters/kiran/parts/pelvis.svg": {
       "raw": 3600,
-      "gzip": 1207
+      "gzip": 1209
     },
     "characters/kiran/parts/torso.svg": {
       "raw": 2813,
@@ -135,7 +135,7 @@
     },
     "characters/yuliya/parts/arm_lower_l.svg": {
       "raw": 4080,
-      "gzip": 1380
+      "gzip": 1382
     },
     "characters/yuliya/parts/arm_lower_r.svg": {
       "raw": 3613,
@@ -143,11 +143,11 @@
     },
     "characters/yuliya/parts/arm_upper_l.svg": {
       "raw": 3348,
-      "gzip": 1161
+      "gzip": 1163
     },
     "characters/yuliya/parts/arm_upper_r.svg": {
       "raw": 2595,
-      "gzip": 942
+      "gzip": 943
     },
     "characters/yuliya/parts/head.svg": {
       "raw": 44558,
@@ -155,15 +155,15 @@
     },
     "characters/yuliya/parts/leg_lower_l.svg": {
       "raw": 2786,
-      "gzip": 958
+      "gzip": 964
     },
     "characters/yuliya/parts/leg_lower_r.svg": {
       "raw": 2286,
-      "gzip": 852
+      "gzip": 855
     },
     "characters/yuliya/parts/leg_upper_l.svg": {
       "raw": 2209,
-      "gzip": 833
+      "gzip": 836
     },
     "characters/yuliya/parts/leg_upper_r.svg": {
       "raw": 2246,
@@ -237,7 +237,7 @@
     },
     "figures/index.json": {
       "raw": 425,
-      "gzip": 169
+      "gzip": 170
     },
     "cosmetics/index.json": {
       "raw": 2694,
