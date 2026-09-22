@@ -6,20 +6,10 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-008 — [BUILD] Run canonical acceptance in PR and `main` CI
-
-- Dependency: none; first open task.
-- Why: The library has no CI even though FightLab consumes its exact commit and digest.
-- Scope: Add PR/main workflow using the pinned toolchain, `npm ci`, `npm run check` and bounded failure output; keep Blender tooling explicit rather than silently skipping a required assertion.
-- Non-goals: No publishing or deploy workflow.
-- Acceptance: Both exact-head PR and accepted `main` run the same library gate.
-- Validation: `npm run check`; workflow review; exact-head CI; `git diff --check`.
-- Authorities: `.github/workflows/ci.yml`, `package.json`.
-
 ### BY-009 — [TEST] Commit pure expected repository settings
 
-- Dependency: BY-008 merged.
-- Why: No settings-as-code record defines protected `main`, required CI or immutable release tags if publication begins.
+- Dependency: none; first open task.
+- Why: Canonical repository acceptance now runs on pull requests and `main`, but no settings-as-code record defines protected `main`, required CI or immutable release tags if publication begins.
 - Scope: Add an expected settings record and pure comparison tests, with current no-release capability explicit; avoid claiming live rulesets from credential-free tests.
 - Non-goals: No provider mutation or publication.
 - Acceptance: Material expected-settings drift fails `check` while product N/A boundaries remain honest.

@@ -59,9 +59,12 @@ not hand-edit generated output to make a check pass. Temporary render/exchange w
 `out/`; reset or teardown must not delete authored source or an artist's Blender project.
 
 There is currently no `npm run dev`, browser runtime, server, Worker, hosted environment or
-production deployment for Boneyard. Do not invent one to satisfy a process template. Repository
-CI is also not present yet, so local validation must be reported truthfully rather than described
-as a green remote check.
+production deployment for Boneyard. Do not invent one to satisfy a process template.
+
+GitHub Actions runs repository acceptance for pull requests targeting `main` and pushes to
+`main`. CI resolves the committed Node/npm toolchain, installs the lockfile with `npm ci`,
+requires real Blender and invokes `npm run check` once. Local and provider acceptance therefore
+share the package-owned gate rather than duplicating it in workflow YAML.
 
 ## Attribution and source material
 

@@ -23,6 +23,7 @@ export interface DeclaredEntryRule {
 export const DECLARED_ENTRY_RULES: readonly DeclaredEntryRule[] = [
   { pattern: ".gitattributes", reason: "Git applies the pinned BVH whitespace policy" },
   { pattern: ".gitignore", reason: "Git keeps generated and disposable state untracked" },
+  { pattern: ".github/workflows/ci.yml", reason: "GitHub Actions repository acceptance entry point" },
   { pattern: "AGENTS.md", reason: "repository contract" },
   { pattern: "LICENSE.md", reason: "root dataset attribution and licence index" },
   { pattern: "README.md", reason: "documentation root" },

@@ -181,5 +181,9 @@ The repository toolchain is Node 24.21.0 with npm 11.19.0. `.node-version` is th
 `package.json` pins the package manager and exact engines, and `.npmrc` rejects unsupported
 runtime versions. Use that pair before `npm ci` or any acceptance command.
 
+GitHub Actions runs the same canonical acceptance for pull requests targeting `main` and pushes
+to accepted `main`: resolve the committed toolchain, install with `npm ci`, require real Blender,
+then invoke `npm run check` once. `package.json`, not workflow YAML, owns the acceptance graph.
+
 Reset and teardown may delete `out/` only. Never authored source, never a `.blend` someone is
 editing.
