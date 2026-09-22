@@ -73,7 +73,7 @@ because it does not build a bundle: the asset directories are the bundle.
 
 ## Contracts
 
-Each one is testable, and something in `verify` tests it.
+Each one is testable, and something in `check` tests it.
 
 **C1 — The rig is data.** `rigs/<name>.rig.json` is the single source of truth: a `contract`
 version a loader refuses to guess at; bones as `{ name, parent, offset: [x, y], tip, slot,
@@ -168,12 +168,14 @@ serves or copies whichever of `rigs/ characters/ cosmetics/ figures/ catalog/` i
 Nothing here knows the name of a consumer. If a change to this repository is motivated by one
 lab's rendering problem, it is probably that lab's change.
 
-## Verify
+## Acceptance
 
 ```bash
 npm run build    # regenerate parts, cosmetics, the catalog and the indexes
-npm run verify   # every gate, typecheck, tests
+npm run check    # canonical full acceptance: every gate, typecheck, tests
 ```
+
+`npm run verify` is a temporary compatibility alias for `npm run check`; it must not own or duplicate gates.
 
 Reset and teardown may delete `out/` only. Never authored source, never a `.blend` someone is
 editing.

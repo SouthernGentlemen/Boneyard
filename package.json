@@ -52,7 +52,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "npm run check:history && npm run check:rig && npm run check:sprites && npm run check:sockets && npm run check:motions && npm run check:bundle && npm run check:exchange && npm run check:wardrobe && npm run check:cruft && npm run check:footprint && npm run typecheck && npm test && npm run check:blender"
+    "check": "npm run check:history && npm run check:rig && npm run check:sprites && npm run check:sockets && npm run check:motions && npm run check:bundle && npm run check:exchange && npm run check:wardrobe && npm run check:cruft && npm run check:footprint && npm run typecheck && npm test && npm run check:blender",
+    "verify": "npm run check"
   },
   "dependencies": {},
   "devDependencies": {

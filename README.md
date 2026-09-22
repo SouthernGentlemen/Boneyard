@@ -35,7 +35,7 @@ npm install
 npm run build                            # parts, cosmetics, catalog and indexes
 npm run render:figure -- --figure yuliya # an assembled review sheet in out/render/
 npm run render:clip -- --clip labWave    # a motion contact sheet
-npm run verify                           # every gate, typecheck and tests
+npm run check                            # canonical full acceptance: every gate, typecheck and tests
 ```
 
 ## Guides

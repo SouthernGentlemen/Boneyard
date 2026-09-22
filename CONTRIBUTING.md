@@ -30,12 +30,14 @@ change being made. The two broad library commands are:
 
 ```bash
 npm run build
-npm run verify
+npm run check
 ```
 
 `build` regenerates the tracked parts, cosmetics, motion catalog and discovery indexes.
-`verify` runs the repository's deterministic guards, generated-output checks, exchange and
-wardrobe checks, cruft and footprint checks, typecheck, tests and Blender check.
+`check` is the canonical full acceptance command. It runs prospective history validation, the
+repository's deterministic guards, generated-output checks, exchange and wardrobe checks, cruft
+and footprint checks, typecheck, tests and Blender validation. `npm run verify` remains a
+temporary compatibility alias that delegates once to `npm run check`.
 
 Generated files are outputs, not alternate authored sources. Change the appropriate source or
 pipeline, regenerate, review the resulting diff and keep generated files byte-reproducible. Do
