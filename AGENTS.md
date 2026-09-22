@@ -8,6 +8,10 @@ that draws these characters consumes this repository rather than keeping its own
 This file is the contract. It describes the repository as it exists. When code and this file
 disagree, one of them is a bug — say which.
 
+[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) is the active current/future queue for
+adopting the WizardGang development process. Its first open task has priority over new asset
+work unless the owner explicitly changes priority; completed tasks belong in Git/GitHub.
+
 ## What lives here, and why the line is where it is
 
 **A pipeline lives here if it reads or writes the asset directories.** That is the whole rule.
