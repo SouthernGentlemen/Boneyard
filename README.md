@@ -40,6 +40,8 @@ npm run verify                           # every gate, typecheck and tests
 
 ## Guides
 
+- [Contributing](CONTRIBUTING.md) — controlled BY changes, validation, generated outputs,
+  attribution and the repository's real capability boundary.
 - [Agent authoring loop](docs/AUTHORING.md) — write a clip or figure against the committed
   schemas, validate it, render a sheet and iterate.
 - [Character atlases](docs/CHARACTER_ATLAS.md) — draw a body-part sheet and trace it into fitted,
