@@ -40,6 +40,7 @@ npm run verify                           # every gate, typecheck and tests
 
 ## Guides
 
+- [Security policy](SECURITY.md) — private vulnerability reporting and sensitive-data handling.
 - [Contributing](CONTRIBUTING.md) — controlled BY changes, validation, generated outputs,
   attribution and the repository's real capability boundary.
 - [Agent authoring loop](docs/AUTHORING.md) — write a clip or figure against the committed
