@@ -6,16 +6,6 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-002 — [DOCS] Define the one-task controlled work queue
-
-- Dependency: BY-001 merged on `main`.
-- Why: `AGENTS.md` has excellent asset contracts but no permanent change IDs, `do needful`, active queue or exact-head PR/CI/merge handoff.
-- Scope: Define prospective BY branch/title/body, first-open/blocked selection, same-delivery task purge, queue exhaustion and one-turn handoff without changing the library's product scope.
-- Non-goals: No asset, rig, pipeline or package behavior change.
-- Acceptance: A fresh agent can execute one BY task and stop with the next prompt; completed tasks do not remain in the plan.
-- Validation: `npm run verify`; `git diff --check`.
-- Authorities: `AGENTS.md`, WG-ARCH-001 §27.
-
 ### BY-003 — [DOCS] Add contributor and capability guidance
 
 - Dependency: BY-002 merged.
