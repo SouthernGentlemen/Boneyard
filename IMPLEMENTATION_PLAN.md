@@ -6,19 +6,9 @@ Boneyard is a private asset/data library, not a browser application or hosted se
 
 ## Open tasks
 
-### BY-006 — [BUILD] Expose full asset acceptance as `npm run check`
-
-- Dependency: BY-005 merged.
-- Why: `verify`, not `check`, currently owns deterministic rig/part/motion/bundle checks, exchange, wardrobe, footprint, cruft, Blender, typecheck and tests.
-- Scope: Make `check` the canonical credential-free gate with that existing coverage plus prospective history; retain `verify` temporarily as an alias without executing gates twice.
-- Non-goals: No new browser runtime, source regeneration or weakened guard.
-- Acceptance: One `check` validates all applicable library outputs and leaves tracked generated files unchanged.
-- Validation: `npm run check`; `npm run verify`; `git diff --check`.
-- Authorities: `package.json`, `CONTRIBUTING.md`.
-
 ### BY-007 — [BUILD] Pin the Node/npm toolchain for repeatable pipelines
 
-- Dependency: BY-006 merged.
+- Dependency: none; first open task.
 - Why: The package has no `.node-version`, `packageManager` or engine policy even though native TypeScript pipeline behavior depends on Node.
 - Scope: Pin a compatible tested Node/npm pair and locked-install policy; document the version without forcing the architecture reference stack's unrelated browser/Worker dependencies.
 - Non-goals: No dependency upgrade or generated asset change unless the new pinned toolchain proves it necessary.
