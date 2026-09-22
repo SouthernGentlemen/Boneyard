@@ -66,6 +66,18 @@ GitHub Actions runs repository acceptance for pull requests targeting `main` and
 requires real Blender and invokes `npm run check` once. Local and provider acceptance therefore
 share the package-owned gate rather than duplicating it in workflow YAML.
 
+## Repository settings policy
+
+`config/github-repository-settings.json` is the deterministic desired-state policy for provider
+settings. It requires protected `main` with the accepted `verify` CI context, records the
+repository's private asset/data-library capability boundary, and keeps publication disabled while
+requiring immutable tags if release capability is ever introduced.
+
+The credential-free process tests compare settings-shaped snapshots with that policy and ignore
+transient provider metadata. They do not prove the current GitHub account, branch protection or
+ruleset state. Live provider verification is a separate read-only controlled operation and any
+tier or permission blocker must be reported rather than inferred away.
+
 ## Attribution and source material
 
 [`LICENSE.md`](LICENSE.md) is the single licence and attribution index for repository data and

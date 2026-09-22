@@ -1,0 +1,32 @@
+{
+  "contract": 1,
+  "repository": {
+    "visibility": "private",
+    "defaultBranch": "main",
+    "merge": {
+      "allowMergeCommit": true,
+      "allowSquashMerge": true,
+      "allowRebaseMerge": true,
+      "deleteBranchOnMerge": false
+    }
+  },
+  "main": {
+    "protected": true,
+    "requiredStatusChecks": [
+      "verify"
+    ]
+  },
+  "capabilities": {
+    "kind": "asset-data-library",
+    "browserRuntime": false,
+    "server": false,
+    "worker": false,
+    "pages": false,
+    "deployment": false,
+    "publication": false
+  },
+  "releasePolicy": {
+    "enabled": false,
+    "immutableTagsWhenEnabled": true
+  }
+}
