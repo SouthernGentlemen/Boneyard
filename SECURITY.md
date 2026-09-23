@@ -1,6 +1,6 @@
 # Security policy
 
-Boneyard is a private asset/data library. Security reports belong in a private channel; copyright,
+Boneyard is an asset/data library with restricted source-material boundaries. Security reports belong in a private channel; copyright,
 licence and provenance questions remain governed by [`LICENSE.md`](LICENSE.md).
 
 ## Reporting a vulnerability
@@ -9,7 +9,7 @@ Do not put vulnerability details, credentials, exploit material, restricted sour
 sensitive reproduction data in a public issue, public pull request, public discussion or other
 public channel.
 
-If you have access to this private repository, report the issue directly to the repository owner
+Report the issue directly to the repository owner
 through the existing private channel used to coordinate that access or work. Include only the
 people needed to investigate the report. If no private channel has been established, request one
 without sending sensitive details first.

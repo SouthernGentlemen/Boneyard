@@ -16,17 +16,23 @@
     }
   ],
   "mainProtection": {
+    "rulesetName": "main-protection",
     "protected": true,
     "requirePullRequest": true,
     "requireBranchUpToDate": true,
     "allowDeletion": false,
-    "allowForcePush": false
+    "allowForcePush": false,
+    "bypassActors": [],
+    "requireExtraApprovalForUnattributedChanges": true,
+    "requiredReviewThreadResolution": false,
+    "doNotEnforceOnCreate": true
   },
   "workflowPermissions": {
     "defaultWorkflowPermissions": "read",
     "canApprovePullRequestReviews": false
   },
   "releaseTags": {
+    "rulesetName": "release-tag-immutability",
     "pattern": "v*",
     "enforcement": "active",
     "immutable": true,
