@@ -25,7 +25,7 @@ The delivering change removes its own task from the active plan. After merge, co
 
 ## Toolchain and locked install
 
-Use Node 24.21.0 with npm 11.19.0. `.node-version` is the Node authority and `package.json` pins
+Use Node 26.9.0 with npm 11.19.1. `.node-version` is the Node authority and `package.json` pins
 both the exact npm package manager and supported engine versions. `.npmrc` enables strict engine
 checking, so an unsupported Node/npm pair is rejected instead of becoming accidental local state.
 
