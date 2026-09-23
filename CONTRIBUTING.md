@@ -21,7 +21,9 @@ Use the task's declared ID and type:
   name the next-task handoff.
 
 The delivering change removes its own task from the active plan. After merge, confirm the accepted
-`main` and stop; do not begin the next task in the same turn.
+`main` and stop; do not begin the next task in the same turn. Controlled delivery follows branch →
+implementation → validation → one controlled branch commit → PR → exact-head CI → squash exact
+validated head → one controlled commit retained on `main` → verify `main` → branch cleanup.
 
 ## Toolchain and locked install
 
@@ -69,14 +71,18 @@ share the package-owned gate rather than duplicating it in workflow YAML.
 ## Repository settings policy
 
 `config/github-repository-settings.json` is the deterministic desired-state policy for provider
-settings. It requires protected `main` with the accepted `verify` CI context, records the
-repository's private asset/data-library capability boundary, and keeps publication disabled while
-requiring immutable tags if release capability is ever introduced.
+settings. It requires protected/current `main` with exact `verify` CI, squash-only PR merges,
+automatic completed-branch deletion, zero bypass actors, and immutable `v*` tags. The
+asset/data-library boundary does not add a hosted deployment or npm publication path.
 
 The credential-free process tests compare settings-shaped snapshots with that policy and ignore
 transient provider metadata. They do not prove the current GitHub account, branch protection or
 ruleset state. Live provider verification is a separate read-only controlled operation and any
-tier or permission blocker must be reported rather than inferred away.
+tier or permission blocker must be reported rather than inferred away. `npm run test:github-settings`
+is credential-free. `npm run verify:github-settings` only reads live settings, using `GH_ADMIN_TOKEN`
+or an authorized `GH_TOKEN` with Repository Administration read access. The explicit
+`npm run apply:github-settings` command requires write access and independently re-reads live
+state after mutation. Neither command prints or persists the token.
 
 ## Attribution and source material
 

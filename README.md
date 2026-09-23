@@ -38,10 +38,15 @@ npm run build                            # parts, cosmetics, catalog and indexes
 npm run render:figure -- --figure yuliya # an assembled review sheet in out/render/
 npm run render:clip -- --clip labWave    # a motion contact sheet
 npm run check                            # canonical full acceptance: every gate, typecheck and tests
+npm run test:github-settings             # credential-free GitHub policy cases
 ```
 
 Pull requests targeting `main` and pushes to `main` run that same gate in GitHub Actions after
 the pinned toolchain, locked `npm ci` install and required Blender setup.
+
+`npm run verify:github-settings` reads live repository settings under `GH_ADMIN_TOKEN` or an
+authorized `GH_TOKEN`. `npm run apply:github-settings` is the explicit admin/write path and
+independently re-reads the committed settings contract after applying it.
 
 ## Guides
 

@@ -6,29 +6,9 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-013 — [BUILD] Expose the common GitHub settings CLI
-
-- Dependency: none; first open task.
-- Why: Normalized repositories expose explicit credential-free tests plus read-only verification and deliberate apply commands instead of embedding provider behavior in ad hoc instructions.
-- Scope: Add the Boneyard equivalents of the shared `test:github-settings`, `verify:github-settings` and `apply:github-settings` command surface, reusing the committed settings authority and keeping verification read-only. Apply must be explicit, deterministic and safe to rerun.
-- Non-goals: Do not silently mutate GitHub from `npm run check`; no release or deployment work.
-- Acceptance: Pure cases run without credentials; verify reports normalized live drift; apply changes only declared settings and can be followed by a clean verify.
-- Validation: CLI-focused tests; canonical `npm run check`; credential-free execution paths; `git diff --check`.
-- Authorities: `package.json`, repository-settings authority, shared provider CLI pattern.
-
-### BY-014 — [OPS] Apply and verify the live repository policy
-
-- Dependency: BY-013.
-- Why: Current authoritative provider state reports `main` unprotected, no repository rulesets, and all three merge methods enabled. Repository-local expectations are not proof of live enforcement.
-- Scope: Re-fetch provider state, apply the committed settings through the explicit CLI/provider path, and verify the result live. Require protected `main`, exact-head `verify`, squash-only merge behavior, automatic completed-branch cleanup where supported, and immutable release-tag protection. Record any exact provider permission or tier blocker instead of claiming success.
-- Non-goals: No bypass, visibility change, paid-plan purchase, release publication or deployment.
-- Acceptance: Live provider evidence matches the committed authority. If the provider makes a required setting unavailable, do not mark the task complete.
-- Validation: Exact provider reads before/after apply; `npm run verify:github-settings`; canonical `npm run check`; exact-head CI.
-- Authorities: GitHub live repository/ruleset state and committed settings authority.
-
 ### BY-015 — [BUILD] Define immutable release identity
 
-- Dependency: BY-014.
+- Dependency: BY-013.
 - Why: Boneyard currently has no GitHub Release line, but downstream consumers need a deterministic way to identify an immutable reviewed asset/data revision without publishing to npm.
 - Scope: Define one release identity contract tying `package.json` version, annotated semantic tag `vX.Y.Z`, exact tagged commit and repository content together. Keep `private: true`; GitHub Releases are the distribution authority, not the npm registry.
 - Non-goals: No npm publication, deployment, asset rewriting or consumer upgrade in this task.

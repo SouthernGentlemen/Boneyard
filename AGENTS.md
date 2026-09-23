@@ -38,8 +38,10 @@ rather than starting duplicate work. Otherwise take only the first open task in
 ahead without owner direction. Unrelated PRs are not substitutes for the queue task.
 
 One task is one delivery: branch from current `main`, implement only that task, run its required
-local validation, inspect the exact PR head and provider rules/checks that actually exist, merge
-only when the PR is current and mergeable under those rules, and confirm the resulting `main`.
+local validation, make one controlled branch commit, inspect the exact PR head and provider
+rules/checks that actually exist, then squash the exact green/current head. Confirm one controlled
+commit on `main`, post-merge CI and completed-branch cleanup. Merge commits and rebase merges are
+not controlled delivery methods.
 The delivering change removes its own task from `IMPLEMENTATION_PLAN.md`; completed task text does
 not survive as a plan-history log.
 
