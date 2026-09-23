@@ -6,19 +6,9 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-011 — [BUILD] Align Node and npm with the shared baseline
-
-- Dependency: none; first open task.
-- Why: Boneyard is pinned to Node 24.21.0 and npm 11.19.0 while the active normalized repositories have moved to the Node 26/npm 11 line. Cross-repo convergence requires one declared organization baseline rather than a Boneyard-specific runtime.
-- Scope: Re-fetch the current organization baseline authority and update `.node-version`, `packageManager`, `engines`, `.npmrc`, CI and documentation together so local and provider execution resolve the same exact pair. Do not independently invent a patch version if the shared baseline has changed again.
-- Non-goals: No application runtime, dependency upgrade wave, release, provider mutation or deployment.
-- Acceptance: `npm ci`, CI and local acceptance resolve the same organization-standard Node/npm pair and fail clearly on a mismatched runtime.
-- Validation: Toolchain-focused tests as needed; `npm ci`; `npm run check`; `git diff --check`.
-- Authorities: organization baseline repository, `.node-version`, `package.json`, `.npmrc`, `.github/workflows/ci.yml`.
-
 ### BY-012 — [TEST] Align committed repository-settings expectations
 
-- Dependency: BY-011.
+- Dependency: none; first open task.
 - Why: BY-009 committed deterministic settings expectations around the then-current merge toggles and conditional tag policy. The organization target is now a shared single-commit merge and release/tag policy.
 - Scope: Update the credential-free repository-settings model and pure cases to describe the converged provider policy: protected `main`, required exact-head `verify`, squash-only merging, branch cleanup after merge, least-privilege workflow permissions, and immutable release-tag rules. Preserve the no-deployment capability boundary.
 - Non-goals: No live provider mutation or GitHub Release publication.

@@ -30,7 +30,7 @@ whole reason the code ships with the data instead of being copied beside it.
 
 ## Run the pipelines
 
-Use Node 24.21.0 with npm 11.19.0, as pinned by `.node-version` and `package.json`.
+Use Node 26.9.0 with npm 11.19.1, as pinned by `.node-version` and `package.json`.
 
 ```bash
 npm ci
