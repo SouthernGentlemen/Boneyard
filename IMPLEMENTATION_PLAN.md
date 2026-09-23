@@ -6,19 +6,9 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-012 — [TEST] Align committed repository-settings expectations
-
-- Dependency: none; first open task.
-- Why: BY-009 committed deterministic settings expectations around the then-current merge toggles and conditional tag policy. The organization target is now a shared single-commit merge and release/tag policy.
-- Scope: Update the credential-free repository-settings model and pure cases to describe the converged provider policy: protected `main`, required exact-head `verify`, squash-only merging, branch cleanup after merge, least-privilege workflow permissions, and immutable release-tag rules. Preserve the no-deployment capability boundary.
-- Non-goals: No live provider mutation or GitHub Release publication.
-- Acceptance: Pure tests distinguish the desired settings from each meaningful drift case without credentials or network access.
-- Validation: Repository-settings cases inside canonical `npm run check`; `git diff --check`.
-- Authorities: `config/github-repository-settings.json`, repository-settings tests, shared organization baseline.
-
 ### BY-013 — [BUILD] Expose the common GitHub settings CLI
 
-- Dependency: BY-012.
+- Dependency: none; first open task.
 - Why: Normalized repositories expose explicit credential-free tests plus read-only verification and deliberate apply commands instead of embedding provider behavior in ad hoc instructions.
 - Scope: Add the Boneyard equivalents of the shared `test:github-settings`, `verify:github-settings` and `apply:github-settings` command surface, reusing the committed settings authority and keeping verification read-only. Apply must be explicit, deterministic and safe to rerun.
 - Non-goals: Do not silently mutate GitHub from `npm run check`; no release or deployment work.

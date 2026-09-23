@@ -16,29 +16,59 @@ function stringList(value: unknown): string[] {
     : [];
 }
 
+function statusChecks(value: unknown): { name: string; exactHead: unknown }[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map(asObject)
+    .filter((entry) => typeof entry.name === "string")
+    .map((entry) => ({
+      name: entry.name as string,
+      exactHead: entry.exactHead,
+    }))
+    .sort((left, right) => left.name.localeCompare(right.name));
+}
+
 export function normalizeRepositorySettings(value: unknown) {
   const root = asObject(value);
-  const repository = asObject(root.repository);
-  const merge = asObject(repository.merge);
-  const main = asObject(root.main);
+  const mergeMethods = asObject(root.mergeMethods);
+  const mainProtection = asObject(root.mainProtection);
+  const workflowPermissions = asObject(root.workflowPermissions);
+  const releaseTags = asObject(root.releaseTags);
   const capabilities = asObject(root.capabilities);
-  const releasePolicy = asObject(root.releasePolicy);
 
   return {
     contract: root.contract,
-    repository: {
-      visibility: repository.visibility,
-      defaultBranch: repository.defaultBranch,
-      merge: {
-        allowMergeCommit: merge.allowMergeCommit,
-        allowSquashMerge: merge.allowSquashMerge,
-        allowRebaseMerge: merge.allowRebaseMerge,
-        deleteBranchOnMerge: merge.deleteBranchOnMerge,
-      },
+    policyKind: root.policyKind,
+    repository: root.repository,
+    defaultBranch: root.defaultBranch,
+    mergeMethods: {
+      mergeCommit: mergeMethods.mergeCommit,
+      squash: mergeMethods.squash,
+      rebase: mergeMethods.rebase,
     },
-    main: {
-      protected: main.protected,
-      requiredStatusChecks: stringList(main.requiredStatusChecks),
+    deleteBranchOnMerge: root.deleteBranchOnMerge,
+    requiredStatusChecks: statusChecks(root.requiredStatusChecks),
+    mainProtection: {
+      protected: mainProtection.protected,
+      requirePullRequest: mainProtection.requirePullRequest,
+      requireBranchUpToDate: mainProtection.requireBranchUpToDate,
+      allowDeletion: mainProtection.allowDeletion,
+      allowForcePush: mainProtection.allowForcePush,
+    },
+    workflowPermissions: {
+      defaultWorkflowPermissions: workflowPermissions.defaultWorkflowPermissions,
+      canApprovePullRequestReviews: workflowPermissions.canApprovePullRequestReviews,
+    },
+    releaseTags: {
+      pattern: releaseTags.pattern,
+      enforcement: releaseTags.enforcement,
+      immutable: releaseTags.immutable,
+      allowDeletion: releaseTags.allowDeletion,
+      allowUpdate: releaseTags.allowUpdate,
+      bypassActors: stringList(releaseTags.bypassActors),
     },
     capabilities: {
       kind: capabilities.kind,
@@ -47,11 +77,7 @@ export function normalizeRepositorySettings(value: unknown) {
       worker: capabilities.worker,
       pages: capabilities.pages,
       deployment: capabilities.deployment,
-      publication: capabilities.publication,
-    },
-    releasePolicy: {
-      enabled: releasePolicy.enabled,
-      immutableTagsWhenEnabled: releasePolicy.immutableTagsWhenEnabled,
+      npmPublication: capabilities.npmPublication,
     },
   };
 }
@@ -61,23 +87,34 @@ export function compareExpectedSettings(expected: unknown, observed: unknown): s
   const actual = normalizeRepositorySettings(observed);
   const fields: readonly [string, unknown, unknown][] = [
     ["contract", wanted.contract, actual.contract],
-    ["repository.visibility", wanted.repository.visibility, actual.repository.visibility],
-    ["repository.defaultBranch", wanted.repository.defaultBranch, actual.repository.defaultBranch],
-    ["repository.merge.allowMergeCommit", wanted.repository.merge.allowMergeCommit, actual.repository.merge.allowMergeCommit],
-    ["repository.merge.allowSquashMerge", wanted.repository.merge.allowSquashMerge, actual.repository.merge.allowSquashMerge],
-    ["repository.merge.allowRebaseMerge", wanted.repository.merge.allowRebaseMerge, actual.repository.merge.allowRebaseMerge],
-    ["repository.merge.deleteBranchOnMerge", wanted.repository.merge.deleteBranchOnMerge, actual.repository.merge.deleteBranchOnMerge],
-    ["main.protected", wanted.main.protected, actual.main.protected],
-    ["main.requiredStatusChecks", wanted.main.requiredStatusChecks, actual.main.requiredStatusChecks],
+    ["policyKind", wanted.policyKind, actual.policyKind],
+    ["repository", wanted.repository, actual.repository],
+    ["defaultBranch", wanted.defaultBranch, actual.defaultBranch],
+    ["mergeMethods.mergeCommit", wanted.mergeMethods.mergeCommit, actual.mergeMethods.mergeCommit],
+    ["mergeMethods.squash", wanted.mergeMethods.squash, actual.mergeMethods.squash],
+    ["mergeMethods.rebase", wanted.mergeMethods.rebase, actual.mergeMethods.rebase],
+    ["deleteBranchOnMerge", wanted.deleteBranchOnMerge, actual.deleteBranchOnMerge],
+    ["requiredStatusChecks", wanted.requiredStatusChecks, actual.requiredStatusChecks],
+    ["mainProtection.protected", wanted.mainProtection.protected, actual.mainProtection.protected],
+    ["mainProtection.requirePullRequest", wanted.mainProtection.requirePullRequest, actual.mainProtection.requirePullRequest],
+    ["mainProtection.requireBranchUpToDate", wanted.mainProtection.requireBranchUpToDate, actual.mainProtection.requireBranchUpToDate],
+    ["mainProtection.allowDeletion", wanted.mainProtection.allowDeletion, actual.mainProtection.allowDeletion],
+    ["mainProtection.allowForcePush", wanted.mainProtection.allowForcePush, actual.mainProtection.allowForcePush],
+    ["workflowPermissions.defaultWorkflowPermissions", wanted.workflowPermissions.defaultWorkflowPermissions, actual.workflowPermissions.defaultWorkflowPermissions],
+    ["workflowPermissions.canApprovePullRequestReviews", wanted.workflowPermissions.canApprovePullRequestReviews, actual.workflowPermissions.canApprovePullRequestReviews],
+    ["releaseTags.pattern", wanted.releaseTags.pattern, actual.releaseTags.pattern],
+    ["releaseTags.enforcement", wanted.releaseTags.enforcement, actual.releaseTags.enforcement],
+    ["releaseTags.immutable", wanted.releaseTags.immutable, actual.releaseTags.immutable],
+    ["releaseTags.allowDeletion", wanted.releaseTags.allowDeletion, actual.releaseTags.allowDeletion],
+    ["releaseTags.allowUpdate", wanted.releaseTags.allowUpdate, actual.releaseTags.allowUpdate],
+    ["releaseTags.bypassActors", wanted.releaseTags.bypassActors, actual.releaseTags.bypassActors],
     ["capabilities.kind", wanted.capabilities.kind, actual.capabilities.kind],
     ["capabilities.browserRuntime", wanted.capabilities.browserRuntime, actual.capabilities.browserRuntime],
     ["capabilities.server", wanted.capabilities.server, actual.capabilities.server],
     ["capabilities.worker", wanted.capabilities.worker, actual.capabilities.worker],
     ["capabilities.pages", wanted.capabilities.pages, actual.capabilities.pages],
     ["capabilities.deployment", wanted.capabilities.deployment, actual.capabilities.deployment],
-    ["capabilities.publication", wanted.capabilities.publication, actual.capabilities.publication],
-    ["releasePolicy.enabled", wanted.releasePolicy.enabled, actual.releasePolicy.enabled],
-    ["releasePolicy.immutableTagsWhenEnabled", wanted.releasePolicy.immutableTagsWhenEnabled, actual.releasePolicy.immutableTagsWhenEnabled],
+    ["capabilities.npmPublication", wanted.capabilities.npmPublication, actual.capabilities.npmPublication],
   ];
 
   return fields
@@ -93,70 +130,145 @@ const expected = JSON.parse(readFileSync(
 const matching = (): JsonObject => JSON.parse(JSON.stringify(expected)) as JsonObject;
 
 describe("expected GitHub repository settings", () => {
-  it("accepts a matching settings-shaped snapshot", () => {
+  it("accepts a matching desired-policy snapshot", () => {
     expect(compareExpectedSettings(expected, matching())).toEqual([]);
   });
 
-  it("rejects a missing required main acceptance check", () => {
-    const observed = matching();
-    asObject(observed.main).requiredStatusChecks = [];
-    expect(compareExpectedSettings(expected, observed)).toContain("main.requiredStatusChecks");
-  });
-
-  it("rejects weakened main protection", () => {
-    const observed = matching();
-    asObject(observed.main).protected = false;
-    expect(compareExpectedSettings(expected, observed)).toContain("main.protected");
-  });
-
-  it("rejects material merge and release-policy drift", () => {
-    const observed = matching();
-    asObject(asObject(observed.repository).merge).allowSquashMerge = false;
-    asObject(observed.releasePolicy).immutableTagsWhenEnabled = false;
-
-    expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
-      "repository.merge.allowSquashMerge",
-      "releasePolicy.immutableTagsWhenEnabled",
-    ]));
-  });
-
-  it("records the current no-publication capability without pretending a release exists", () => {
+  it("requires protected main and the exact-head verify check", () => {
     const normalized = normalizeRepositorySettings(expected);
-    expect(normalized.capabilities.kind).toBe("asset-data-library");
-    expect(normalized.capabilities.publication).toBe(false);
-    expect(normalized.releasePolicy.enabled).toBe(false);
-    expect(normalized.releasePolicy.immutableTagsWhenEnabled).toBe(true);
+    expect(normalized.defaultBranch).toBe("main");
+    expect(normalized.mainProtection).toEqual({
+      protected: true,
+      requirePullRequest: true,
+      requireBranchUpToDate: true,
+      allowDeletion: false,
+      allowForcePush: false,
+    });
+    expect(normalized.requiredStatusChecks).toEqual([
+      {
+        name: "verify",
+        exactHead: true,
+      },
+    ]);
 
     const observed = matching();
-    asObject(observed.capabilities).publication = true;
-    asObject(observed.releasePolicy).enabled = true;
+    asObject(observed.mainProtection).protected = false;
+    asObject(observed.mainProtection).requireBranchUpToDate = false;
+    asObject(observed.mainProtection).allowForcePush = true;
+    observed.requiredStatusChecks = [
+      {
+        name: "verify",
+        exactHead: false,
+      },
+    ];
+
     expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
-      "capabilities.publication",
-      "releasePolicy.enabled",
+      "requiredStatusChecks",
+      "mainProtection.protected",
+      "mainProtection.requireBranchUpToDate",
+      "mainProtection.allowForcePush",
     ]));
   });
 
-  it("ignores provider metadata that is intentionally outside the policy contract", () => {
+  it("rejects merge-method and completed-branch-cleanup drift", () => {
     const observed = matching();
-    observed.id = 1376657754;
-    observed.node_id = "transient";
-    observed.updated_at = "2099-01-01T00:00:00Z";
-    Object.assign(asObject(observed.repository), {
-      pushedAt: "2099-01-01T00:00:00Z",
-      htmlUrl: "https://example.invalid/repository",
+    const mergeMethods = asObject(observed.mergeMethods);
+    mergeMethods.mergeCommit = true;
+    mergeMethods.squash = false;
+    mergeMethods.rebase = true;
+    observed.deleteBranchOnMerge = false;
+
+    expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
+      "mergeMethods.mergeCommit",
+      "mergeMethods.squash",
+      "mergeMethods.rebase",
+      "deleteBranchOnMerge",
+    ]));
+  });
+
+  it("requires least-privilege workflow defaults", () => {
+    const normalized = normalizeRepositorySettings(expected);
+    expect(normalized.workflowPermissions).toEqual({
+      defaultWorkflowPermissions: "read",
+      canApprovePullRequestReviews: false,
     });
-    Object.assign(asObject(observed.main), {
+
+    const observed = matching();
+    const workflowPermissions = asObject(observed.workflowPermissions);
+    workflowPermissions.defaultWorkflowPermissions = "write";
+    workflowPermissions.canApprovePullRequestReviews = true;
+
+    expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
+      "workflowPermissions.defaultWorkflowPermissions",
+      "workflowPermissions.canApprovePullRequestReviews",
+    ]));
+  });
+
+  it("requires immutable v* release tags with no bypass actors", () => {
+    const normalized = normalizeRepositorySettings(expected);
+    expect(normalized.releaseTags).toEqual({
+      pattern: "v*",
+      enforcement: "active",
+      immutable: true,
+      allowDeletion: false,
+      allowUpdate: false,
+      bypassActors: [],
+    });
+
+    const observed = matching();
+    const releaseTags = asObject(observed.releaseTags);
+    releaseTags.enforcement = "disabled";
+    releaseTags.immutable = false;
+    releaseTags.allowDeletion = true;
+    releaseTags.allowUpdate = true;
+    releaseTags.bypassActors = ["RepositoryRole:maintain"];
+
+    expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
+      "releaseTags.enforcement",
+      "releaseTags.immutable",
+      "releaseTags.allowDeletion",
+      "releaseTags.allowUpdate",
+      "releaseTags.bypassActors",
+    ]));
+  });
+
+  it("preserves Boneyard's asset/data-library no-deployment boundary", () => {
+    const normalized = normalizeRepositorySettings(expected);
+    expect(normalized.capabilities).toEqual({
+      kind: "asset-data-library",
+      browserRuntime: false,
+      server: false,
+      worker: false,
+      pages: false,
+      deployment: false,
+      npmPublication: false,
+    });
+
+    const observed = matching();
+    const capabilities = asObject(observed.capabilities);
+    capabilities.worker = true;
+    capabilities.deployment = true;
+    capabilities.npmPublication = true;
+
+    expect(compareExpectedSettings(expected, observed)).toEqual(expect.arrayContaining([
+      "capabilities.worker",
+      "capabilities.deployment",
+      "capabilities.npmPublication",
+    ]));
+  });
+
+  it("ignores live metadata and visibility that are outside the desired policy contract", () => {
+    const observed = matching();
+    Object.assign(observed, {
+      id: 1376657754,
+      visibility: "public",
+      updated_at: "2099-01-01T00:00:00Z",
+    });
+    Object.assign(asObject(observed.mainProtection), {
       protectionUrl: "https://example.invalid/protection",
       workflowRunId: 123456,
     });
 
     expect(compareExpectedSettings(expected, observed)).toEqual([]);
-  });
-
-  it("requires the repository's accepted main CI context", () => {
-    const normalized = normalizeRepositorySettings(expected);
-    expect(normalized.repository.defaultBranch).toBe("main");
-    expect(normalized.main.protected).toBe(true);
-    expect(normalized.main.requiredStatusChecks).toEqual(["verify"]);
   });
 });

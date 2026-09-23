@@ -1,20 +1,38 @@
 {
-  "contract": 1,
-  "repository": {
-    "visibility": "private",
-    "defaultBranch": "main",
-    "merge": {
-      "allowMergeCommit": true,
-      "allowSquashMerge": true,
-      "allowRebaseMerge": true,
-      "deleteBranchOnMerge": false
-    }
+  "contract": 2,
+  "policyKind": "desired",
+  "repository": "SouthernGentlemen/Boneyard",
+  "defaultBranch": "main",
+  "mergeMethods": {
+    "mergeCommit": false,
+    "squash": true,
+    "rebase": false
   },
-  "main": {
+  "deleteBranchOnMerge": true,
+  "requiredStatusChecks": [
+    {
+      "name": "verify",
+      "exactHead": true
+    }
+  ],
+  "mainProtection": {
     "protected": true,
-    "requiredStatusChecks": [
-      "verify"
-    ]
+    "requirePullRequest": true,
+    "requireBranchUpToDate": true,
+    "allowDeletion": false,
+    "allowForcePush": false
+  },
+  "workflowPermissions": {
+    "defaultWorkflowPermissions": "read",
+    "canApprovePullRequestReviews": false
+  },
+  "releaseTags": {
+    "pattern": "v*",
+    "enforcement": "active",
+    "immutable": true,
+    "allowDeletion": false,
+    "allowUpdate": false,
+    "bypassActors": []
   },
   "capabilities": {
     "kind": "asset-data-library",
@@ -23,10 +41,6 @@
     "worker": false,
     "pages": false,
     "deployment": false,
-    "publication": false
-  },
-  "releasePolicy": {
-    "enabled": false,
-    "immutableTagsWhenEnabled": true
+    "npmPublication": false
   }
 }
