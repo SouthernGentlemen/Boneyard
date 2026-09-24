@@ -8,16 +8,6 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-019 — [DOCS] Complete process-parity acceptance
-
-- Dependency: BY-018.
-- Why: The wave should end with one fresh comparison against the active organization baseline rather than leaving drift hidden in accumulated task assumptions.
-- Scope: Re-audit npm/toolchain, canonical acceptance, controlled history, merge settings, provider CLI, branch/ruleset enforcement, tag identity, GitHub Release behavior and the explicit no-deploy boundary. Reconcile current-state docs only. Delete `IMPLEMENTATION_PLAN.md` in this delivery when all required evidence is green.
-- Non-goals: No new feature or unrelated asset work.
-- Acceptance: Fresh repository and provider evidence show Boneyard follows the shared process everywhere applicable, with deployment explicitly N/A, and no implementation queue remains.
-- Validation: `npm ci`; `npm run check`; live settings verification; release/tag evidence; exact-head CI; `git diff --check`.
-- Authorities: current repository state, provider state and organization baseline.
-
 ### BY-021 — [OPS] Normalize shared package, workflow, and npm command contracts
 
 - Dependency: BY-019 delivered; portfolio planning policy BY-020 merged. Coordinate with the same normalization task in every public sibling repository.
