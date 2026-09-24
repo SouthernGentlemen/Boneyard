@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import {
   RELEASE_TAG_PATTERN,
   validateReleaseIdentity,
+  verifyReleaseIdentity,
 } from "../scripts/release-identity.mjs";
 
 function matchingIdentity() {
@@ -19,6 +24,40 @@ function matchingIdentity() {
     packagePrivate: true,
     worktreeClean: true,
   };
+}
+
+function git(root, args) {
+  return execFileSync("git", args, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
+}
+
+function writePackage(root, version = "0.1.0") {
+  writeFileSync(
+    join(root, "package.json"),
+    `${JSON.stringify({ name: "release-identity-fixture", version, private: true }, null, 2)}\n`,
+  );
+}
+
+function commitAll(root, message) {
+  git(root, ["add", "."]);
+  git(root, ["commit", "--quiet", "-m", message]);
+}
+
+function withDisposableRepo(run, version = "0.1.0") {
+  const root = mkdtempSync(join(tmpdir(), "boneyard-release-identity-"));
+  try {
+    git(root, ["init", "--quiet"]);
+    git(root, ["config", "user.name", "Boneyard Tests"]);
+    git(root, ["config", "user.email", "boneyard-tests@example.invalid"]);
+    writePackage(root, version);
+    commitAll(root, "fixture");
+    return run(root);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 }
 
 test("strict release tag and exact identity pass", () => {
@@ -56,4 +95,45 @@ test("private package and clean tracked checkout remain part of release identity
   const dirty = matchingIdentity();
   dirty.worktreeClean = false;
   assert.match(validateReleaseIdentity(dirty).join("\n"), /working tree\/index/);
+});
+
+test("disposable repository rejects a lightweight release tag", () => {
+  withDisposableRepo((root) => {
+    git(root, ["tag", "v0.1.0"]);
+    const result = verifyReleaseIdentity(root, "v0.1.0");
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /must be annotated/);
+  });
+});
+
+test("disposable repository rejects a mismatched package version", () => {
+  withDisposableRepo((root) => {
+    git(root, ["tag", "-a", "v0.1.0", "-m", "v0.1.0"]);
+    const result = verifyReleaseIdentity(root, "v0.1.0");
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /tag\/version mismatch/);
+  }, "0.1.1");
+});
+
+test("disposable repository rejects a tag that does not point at exact HEAD", () => {
+  withDisposableRepo((root) => {
+    git(root, ["tag", "-a", "v0.1.0", "-m", "v0.1.0"]);
+    writeFileSync(join(root, "after-tag.txt"), "later commit\n");
+    commitAll(root, "after tag");
+
+    const result = verifyReleaseIdentity(root, "v0.1.0");
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /tagged commit mismatch/);
+  });
+});
+
+test("disposable repository accepts the annotated exact-head release identity", () => {
+  withDisposableRepo((root) => {
+    git(root, ["tag", "-a", "v0.1.0", "-m", "v0.1.0"]);
+    const result = verifyReleaseIdentity(root, "v0.1.0");
+    assert.equal(result.ok, true, result.errors.join("\n"));
+    assert.equal(result.tagObjectType, "tag");
+    assert.equal(result.taggedCommit, result.headCommit);
+    assert.equal(result.taggedTree, result.headTree);
+  });
 });

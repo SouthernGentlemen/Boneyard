@@ -8,16 +8,6 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-016 — [TEST] Guard annotated tag and package identity
-
-- Dependency: BY-015.
-- Why: The release contract needs deterministic failure cases before provider publication depends on it.
-- Scope: Add pure disposable-repository cases proving lightweight tags fail, mismatched semantic versions fail, tags pointing at the wrong commit fail, and the correct annotated exact-head tag succeeds. Keep network and credentials out of canonical acceptance.
-- Non-goals: No GitHub Release creation or provider mutation.
-- Acceptance: Canonical `npm run check` exercises the full release-identity boundary with both positive and negative cases.
-- Validation: Release identity test suite; `npm run check`; `git diff --check`.
-- Authorities: release identity implementation and Git semantics.
-
 ### BY-017 — [OPS] Publish GitHub Releases from verified tags
 
 - Dependency: BY-016.
