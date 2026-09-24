@@ -58,10 +58,11 @@ export function validateControlledHistory(
 
   const errors: string[] = [];
   const seen = new Set<number>();
+  const earlyMaintenance = new Set<number>();
   const controlled = commits.slice(bootstrapIndex);
 
-  for (const [offset, commit] of controlled.entries()) {
-    const expected = offset + 1;
+  let expected = 1;
+  for (const commit of controlled) {
     const [title = ""] = commit.message.split(/\r?\n/, 1);
     const match = title.match(TITLE);
 
@@ -77,10 +78,16 @@ export function validateControlledHistory(
     if (seen.has(id)) errors.push(`${short(commit.sha)}: duplicate controlled ID ${label}`);
     else seen.add(id);
 
-    if (id !== expected) {
+    while (earlyMaintenance.has(expected)) expected += 1;
+    const maintenance = /^Portfolio-Plan-Maintenance: true$/m.test(commit.message);
+    if (maintenance && id > expected) {
+      earlyMaintenance.add(id);
+    } else if (id !== expected) {
       errors.push(
         `${short(commit.sha)}: expected BY-${String(expected).padStart(3, "0")}, found ${label}`,
       );
+    } else {
+      expected += 1;
     }
 
     if (!CONTROLLED_TYPE_SET.has(type)) {
