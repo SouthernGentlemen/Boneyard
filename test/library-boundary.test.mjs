@@ -69,7 +69,6 @@ test("GitHub Release capability remains present without npm or production deploy
 test("current-state docs define the immutable downstream pin/update path and no-deploy boundary", () => {
   for (const [name, document] of [
     ["AGENTS.md", agents],
-    ["CONTRIBUTING.md", contributing],
     ["README.md", readme],
   ]) {
     assert.match(document, /immutable annotated `vX\.Y\.Z` Git tag/i, `${name} must name the immutable tag authority`);
@@ -79,6 +78,7 @@ test("current-state docs define the immutable downstream pin/update path and no-
   assert.match(agents, /does not publish to the npm registry/i);
   assert.match(agents, /host a Worker\/runtime server/i);
   assert.match(agents, /deploy GitHub Pages/i);
-  assert.match(contributing, /do not modify consumer repositories/i);
   assert.match(readme, /does not push updates into\s+consumer repositories/i);
+  assert.match(contributing, /A library or local-only application does not acquire a hosted deployment merely for parity/i);
+  assert.doesNotMatch(contributing, /immutable annotated `vX\.Y\.Z` Git tag/i);
 });

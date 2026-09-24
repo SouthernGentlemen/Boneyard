@@ -1,11 +1,5 @@
 # Working in Boneyard
 
-## Portfolio plan maintenance
-
-An explicit owner-directed portfolio planning request may append or clarify future tasks while the first open implementation task or its pull request remains active. Preserve all existing open tasks and their order; the maintenance change does not deliver, retire, or skip one. Reserve a separate controlled maintenance ID outside the implementation task headings: normally the first unassigned ID after the queued IDs, or an existing unassigned gap when the repository history contract requires it. Once this policy setup is merged, routine amendments change only the active implementation plan file. This exception is for planning edits, not implementation or provider mutation.
-
-Record authoritative `main` and the plan's base before editing. Immediately before a maintenance merge, re-fetch `main`, open pull requests, the exact head, checks, and mergeability. If `main` or the plan moved, rebase and reconcile the additive plan edit, then revalidate the new exact head. Only the actual last remaining task deletes the plan. The normal first-open-task rule still governs the next implementation delivery.
-
 Boneyard is the rig, the art and the motion. A PNG sprite sheet becomes one fitted SVG per body
 part; a figure manifest selects parts and cosmetics; motion capture and hand edits become sparse
 keyframes on that rig; and a small set of pure functions says what all of it means. Every lab
@@ -14,9 +8,7 @@ that draws these characters consumes this repository rather than keeping its own
 This file is the contract. It describes the repository as it exists. When code and this file
 disagree, one of them is a bug — say which.
 
-[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) is the active current/future queue for
-adopting the WizardGang development process. Its first open task has priority over new asset
-work unless the owner explicitly changes priority; completed tasks belong in Git/GitHub.
+When `IMPLEMENTATION_PLAN.md` exists, it is the active current/future queue and its first open task has priority over new asset work unless the owner explicitly changes priority. When the plan is absent, controlled implementation pauses for a fresh repository/provider audit and a new prospective queue; completed tasks belong in Git/GitHub.
 
 ## Controlled work
 
@@ -38,10 +30,11 @@ controlled commits require exactly one non-empty `Task:`, `Scope:` and `Validati
 `Task:` must repeat the title ID.
 
 `do needful` means re-fetch authoritative `main`, open PRs and current provider state before
-editing. If a current, authoritative PR already delivers the first open task, finish that PR
-rather than starting duplicate work. Otherwise take only the first open task in
-`IMPLEMENTATION_PLAN.md`. If that task is blocked, report the exact blocker and stop; do not skip
-ahead without owner direction. Unrelated PRs are not substitutes for the queue task.
+editing. If an active implementation plan exists, finish a current authoritative PR for its first
+open task rather than duplicating it, otherwise take only that first task. If it is blocked, report
+the exact blocker and stop; do not skip ahead without owner direction. When no active plan exists,
+enter fresh planning mode: audit current repository and provider drift and publish a new prospective
+queue before implementation. Unrelated PRs are not substitutes for the queue task.
 
 One task is one delivery: branch from current `main`, implement only that task, run its required
 local validation, make one controlled branch commit, inspect the exact PR head and provider
@@ -181,6 +174,7 @@ lab's rendering problem, it is probably that lab's change.
 ```bash
 npm run build    # regenerate parts, cosmetics, the catalog and the indexes
 npm run check    # canonical full acceptance: every gate, typecheck, tests
+npm run audit:dependencies  # separate network-dependent high-severity advisory gate
 ```
 
 `npm run verify` is a temporary compatibility alias for `npm run check`; it must not own or duplicate gates.
@@ -189,9 +183,20 @@ The repository toolchain is Node 26.9.0 with npm 11.19.1. `.node-version` is the
 `package.json` pins the package manager and exact engines, and `.npmrc` rejects unsupported
 runtime versions. Use that pair before `npm ci` or any acceptance command.
 
-GitHub Actions runs the same canonical acceptance for pull requests targeting `main` and pushes
-to accepted `main`: resolve the committed toolchain, install with `npm ci`, require real Blender,
-then invoke `npm run check` once. `package.json`, not workflow YAML, owns the acceptance graph.
+Shared process normalization pins Boneyard's direct development tools exactly to `@types/node`
+24.13.5, TypeScript 5.9.3 and Vitest 5.0.1. The TypeScript 5 / Node-types 24 lane is intentional:
+FightLab consumes Boneyard source under that compiler/type contract, so Boneyard continues to test
+the lowest supported direct-source consumer lane while newer siblings may use TypeScript 7 and
+Node-types 26. Revisit that compatibility floor only with the source consumers together.
+
+`CONTRIBUTING.md` is the byte-identical shared public-repository contribution contract. Boneyard-
+specific asset, release and no-deploy rules live here rather than forking that shared file.
+
+GitHub Actions checks out the exact pull-request head or accepted `main` revision with full history.
+Pull requests run `git diff --check` against their base, the workflow resolves the committed
+toolchain, installs with `npm ci`, runs the separate network-dependent `npm run audit:dependencies`
+gate, requires real Blender, then invokes `npm run check` once. `npm run check` remains the canonical
+repository-owned acceptance graph and does not absorb the advisory network dependency.
 
 Repository/provider process authority is committed in `config/github-repository-settings.json`.
 The supported delivery policy is squash-only with merged-branch cleanup. The active
