@@ -57,11 +57,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run check:history && npm run check:rig && npm run check:sprites && npm run check:sockets && npm run check:motions && npm run check:bundle && npm run check:exchange && npm run check:wardrobe && npm run check:cruft && npm run check:footprint && npm run typecheck && npm test && npm run test:github-settings && npm run check:blender",
+    "check": "npm run check:history && npm run check:rig && npm run check:sprites && npm run check:sockets && npm run check:motions && npm run check:bundle && npm run check:exchange && npm run check:wardrobe && npm run check:cruft && npm run check:footprint && npm run typecheck && npm test && npm run test:release-identity && npm run test:github-settings && npm run check:blender",
     "verify": "npm run check",
     "test:github-settings": "node --test test/github-settings-policy.test.mjs",
     "verify:github-settings": "node scripts/verify-github-settings.mjs",
-    "apply:github-settings": "node scripts/apply-github-settings.mjs"
+    "apply:github-settings": "node scripts/apply-github-settings.mjs",
+    "test:release-identity": "node --test test/release-identity.test.mjs",
+    "verify:release-identity": "node scripts/release-identity.mjs"
   },
   "dependencies": {},
   "devDependencies": {

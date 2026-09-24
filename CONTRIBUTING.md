@@ -92,10 +92,26 @@ recorded provenance, pinned source revisions or hashes, copyright holders, licen
 explicitly unresolved provenance. Do not copy licence text into this guide or infer redistribution
 permission from a file's presence in the repository.
 
-## Release capability
+## Release identity
 
-The package is currently private and normal contribution work does not publish a package, create
-a hosted deployment or perform a production release. Do not claim or add release capability
-unless an explicit controlled task authorizes and validates it. If publication is introduced
-later, its release record must preserve the repository's source, provenance and attribution
-requirements rather than treating this asset library like an application deployment.
+Boneyard stays `private: true`; it is not published to the npm registry. Its immutable release
+identity is an annotated semantic Git tag `vX.Y.Z` whose version exactly matches
+`package.json`, whose peeled commit is the checkout's exact `HEAD`, and whose tree is the same
+repository tree as that `HEAD`. The verifier reads `package.json` from the tagged commit and
+records the tag object, commit, tree and package blob identities so the candidate is tied to
+immutable Git content rather than mutable working files.
+
+Verify a candidate with:
+
+```bash
+npm run verify:release-identity -- --tag v0.1.0
+```
+
+The verifier also requires the tracked index/worktree to match the exact tagged commit. It uses
+only local Git data and repository files; it needs no network or provider credential. Canonical
+`npm run check` exercises its pure identity cases without requiring a release tag on ordinary
+pull requests.
+
+This identity check does not create a tag, publish a GitHub Release, publish npm content, or
+deploy anything. Provider publication remains a separate controlled capability. Any future
+release record must preserve the repository's source, provenance and attribution requirements.
