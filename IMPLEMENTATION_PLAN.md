@@ -6,16 +6,6 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-015 — [BUILD] Define immutable release identity
-
-- Dependency: BY-014.
-- Why: Boneyard currently has no GitHub Release line, but downstream consumers need a deterministic way to identify an immutable reviewed asset/data revision without publishing to npm.
-- Scope: Define one release identity contract tying `package.json` version, annotated semantic tag `vX.Y.Z`, exact tagged commit and repository content together. Keep `private: true`; GitHub Releases are the distribution authority, not the npm registry.
-- Non-goals: No npm publication, deployment, asset rewriting or consumer upgrade in this task.
-- Acceptance: A release candidate can be proven locally from immutable repository inputs and fails on tag/version/commit mismatch.
-- Validation: Release-identity cases; canonical `npm run check`; `git diff --check`.
-- Authorities: `package.json`, Git annotated tags, release identity scripts/tests.
-
 ### BY-016 — [TEST] Guard annotated tag and package identity
 
 - Dependency: BY-015.
