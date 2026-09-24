@@ -8,16 +8,6 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-017 — [OPS] Publish GitHub Releases from verified tags
-
-- Dependency: BY-016.
-- Why: The organization release path is annotated tag -> exact identity verification -> canonical acceptance -> GitHub Release. Boneyard should use the same authority even though it does not deploy.
-- Scope: Add the provider workflow/CLI path that accepts only a verified annotated `vX.Y.Z` tag, resolves the exact tagged revision, runs `npm ci` and canonical `npm run check`, verifies package/tag identity, then publishes with `gh release create --verify-tag`. Publication must be idempotent or fail safely if the release already exists.
-- Non-goals: No npm registry publication, Cloudflare/Wrangler deployment or automatic version bump.
-- Acceptance: A valid tag can produce exactly one GitHub Release only after all identity and acceptance gates pass; invalid tags cannot publish.
-- Validation: Workflow structure tests; exact-head/tag CI evidence; GitHub Release provider evidence when exercised; `git diff --check`.
-- Authorities: release workflow, GitHub CLI, annotated tag, package version.
-
 ### BY-018 — [TEST] Guard the non-deployable library boundary
 
 - Dependency: BY-017.

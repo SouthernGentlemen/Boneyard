@@ -193,5 +193,12 @@ GitHub Actions runs the same canonical acceptance for pull requests targeting `m
 to accepted `main`: resolve the committed toolchain, install with `npm ci`, require real Blender,
 then invoke `npm run check` once. `package.json`, not workflow YAML, owns the acceptance graph.
 
+Annotated semantic `vX.Y.Z` tags use `.github/workflows/release.yml` as the GitHub Release path.
+The workflow checks out the exact tag with full history, verifies the annotated tag/package identity,
+installs the locked dependencies, requires real Blender for canonical `npm run check`, and only then
+publishes with `gh release create --verify-tag`. Existing releases are treated idempotently; a failed
+create is accepted only when a release for that same tag can subsequently be observed. GitHub Releases
+are the distribution authority; this does not publish the private package or create a deployment.
+
 Reset and teardown may delete `out/` only. Never authored source, never a `.blend` someone is
 editing.
