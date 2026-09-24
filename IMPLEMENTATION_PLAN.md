@@ -8,16 +8,6 @@ Boneyard is an asset/data library, not a browser application or hosted service. 
 
 ## Open tasks
 
-### BY-018 — [TEST] Guard the non-deployable library boundary
-
-- Dependency: BY-017.
-- Why: Cross-repo parity must not accidentally turn Boneyard into a hosted service. Its post-release continuation is downstream consumer pinning, not production deployment.
-- Scope: Codify and test that Boneyard has no production deploy command/workflow/runtime while documenting the supported downstream pin/update path against immutable Git tags/releases. Guard against introduction of a Worker, Pages deploy, production Wrangler command or npm publication without an explicit future architecture change.
-- Non-goals: No consumer-repository modification in this task.
-- Acceptance: Canonical acceptance proves release capability exists while deployment/publication capability remains intentionally absent.
-- Validation: Boundary tests; documentation checks; `npm run check`; `git diff --check`.
-- Authorities: `AGENTS.md`, `CONTRIBUTING.md`, `package.json`, workflows.
-
 ### BY-019 — [DOCS] Complete process-parity acceptance
 
 - Dependency: BY-018.

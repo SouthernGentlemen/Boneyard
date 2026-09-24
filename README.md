@@ -28,6 +28,15 @@ const joints = forwardKinematics(rig, sampleClip(clip, tick));
 Two labs that both call `sampleClip` cannot disagree about what a keyframe means. That is the
 whole reason the code ships with the data instead of being copied beside it.
 
+## Releases and downstream updates
+
+Boneyard is released as immutable annotated `vX.Y.Z` Git tags with matching GitHub Releases.
+A downstream consumer pins the repository to one of those tags (for example with its Git dependency
+or lockfile), validates that exact release in the consumer, and explicitly advances the pin when it
+chooses to adopt a newer release. The GitHub Release is the discovery/distribution record for the
+same immutable tag; Boneyard is not published to the npm registry and does not push updates into
+consumer repositories.
+
 ## Run the pipelines
 
 Use Node 26.9.0 with npm 11.19.1, as pinned by `.node-version` and `package.json`.

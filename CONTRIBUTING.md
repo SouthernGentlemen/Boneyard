@@ -14,6 +14,8 @@ Use the exact Node version in `.node-version` and npm version in `package.json`'
 
 Shared dependencies and versioned vendor tooling should use one supported version across public repositories when those repositories consume them. GitHub Actions workflows and common npm script names should have equivalent behavior for equivalent capabilities. A library or local-only application does not acquire a hosted deployment merely for parity.
 
+For Boneyard, downstream updates are consumer-owned: consumers pin immutable annotated `vX.Y.Z` Git tags or the matching GitHub Release, run their own validation, and explicitly move that pin when adopting a new release. Do not substitute npm registry publication, a Worker/runtime server, GitHub Pages, or a production deploy workflow for that path, and do not modify consumer repositories as part of a Boneyard release.
+
 ## Contribution and security boundaries
 
 Keep changes scoped to one controlled delivery unless the owner requests portfolio plan maintenance. Record validation and provider actions truthfully. Follow the repository's AGENTS.md for branch, commit, pull request, exact-head CI, and squash-merge requirements. Use [SECURITY.md](SECURITY.md) for security reports. Ownership is defined by AGENTS.md and its linked ownership policy where present.

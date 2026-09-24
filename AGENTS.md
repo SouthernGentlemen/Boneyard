@@ -200,5 +200,12 @@ publishes with `gh release create --verify-tag`. Existing releases are treated i
 create is accepted only when a release for that same tag can subsequently be observed. GitHub Releases
 are the distribution authority; this does not publish the private package or create a deployment.
 
+Downstream adoption is consumer-owned: pin an immutable annotated `vX.Y.Z` Git tag (or the matching
+GitHub Release), validate that exact revision in the consumer, and explicitly advance the pin when a
+new release is adopted. Boneyard does not publish to the npm registry, host a Worker/runtime server,
+deploy GitHub Pages, run production deployment commands, or mutate consumer repositories as part of
+release. Adding any such capability requires an explicit future architecture change that updates this
+contract and its boundary tests first.
+
 Reset and teardown may delete `out/` only. Never authored source, never a `.blend` someone is
 editing.
