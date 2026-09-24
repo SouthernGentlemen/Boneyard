@@ -193,6 +193,17 @@ GitHub Actions runs the same canonical acceptance for pull requests targeting `m
 to accepted `main`: resolve the committed toolchain, install with `npm ci`, require real Blender,
 then invoke `npm run check` once. `package.json`, not workflow YAML, owns the acceptance graph.
 
+Repository/provider process authority is committed in `config/github-repository-settings.json`.
+The supported delivery policy is squash-only with merged-branch cleanup. The active
+`main-protection` ruleset requires a pull request, requires the exact `verify` status check and a
+head current with `main`, blocks deletion and non-fast-forward updates, and has no bypass actors.
+The active `release-tag-immutability` ruleset covers `refs/tags/v*`, blocks tag update and deletion,
+and has no bypass actors. `check:history` keeps controlled first-parent BY history sequential and
+requires the permanent title/body contract. `npm run test:github-settings` guards the committed
+policy without credentials; `npm run verify:github-settings` separately compares the live provider
+state when an administration-capable token is available, and `npm run apply:github-settings` is the
+explicit write path.
+
 Annotated semantic `vX.Y.Z` tags use `.github/workflows/release.yml` as the GitHub Release path.
 The workflow checks out the exact tag with full history, verifies the annotated tag/package identity,
 installs the locked dependencies, requires real Blender for canonical `npm run check`, and only then
