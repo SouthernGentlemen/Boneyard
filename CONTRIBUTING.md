@@ -1,118 +1,19 @@
 # Contributing
 
-Read [`AGENTS.md`](AGENTS.md) before changing Boneyard. This repository is an asset/data library:
-the rig, art, motion, generated catalogs and the deterministic pipelines that interpret or produce
-them. It is not a browser application or hosted service.
+Read [AGENTS.md](AGENTS.md) before changing a repository. It owns the repository's product boundaries, controlled change identity, validation details, and merge rules. Read the active implementation plan when present; its filename may be `implementation_plan.md` or `IMPLEMENTATION_PLAN.md`.
 
-## Controlled changes
+## Work queue and plan updates
 
-Prospective work follows the controlled `BY-NNN` queue in
-[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). On `do needful`, re-fetch authoritative
-`main`, open pull requests and current provider state; finish an authoritative delivery for the
-first open task if one already exists, otherwise take only that first task. Do not skip a blocked
-first task without owner direction.
+The first open plan task is the default next implementation task unless the owner explicitly changes priority. Keep existing open tasks in place when appending future work. A separately requested portfolio plan maintenance change may append or clarify future tasks while another task or pull request is in progress. Once the shared policy is established, that maintenance change edits only the active plan file and does not claim to deliver a queued task. The last task deletes the plan only when no later task remains.
 
-Use the task's declared ID and type:
+Before editing or merging, fetch current `main` and inspect open pull requests. Record the base commit and the plan's current contents. Immediately before merging, fetch again and compare the current `main` commit, exact pull request head, and plan against that recorded base. Rebase and reconcile any concurrent plan change rather than overwriting it. Merge only the current, mergeable head after required checks pass.
 
-- branch: `by-NNN-kebab-case-summary`;
-- commit and pull-request title: `[BY-NNN] [TYPE] Imperative summary`;
-- commit body: identify `Task: BY-NNN`, summarize the narrow scope and record validation;
-- pull-request body: identify task and scope, record validation and observed provider state, and
-  name the next-task handoff.
+## Toolchain and commands
 
-The delivering change removes its own task from the active plan. After merge, confirm the accepted
-`main` and stop; do not begin the next task in the same turn. Controlled delivery follows branch →
-implementation → validation → one controlled branch commit → PR → exact-head CI → squash exact
-validated head → one controlled commit retained on `main` → verify `main` → branch cleanup.
+Use the exact Node version in `.node-version` and npm version in `package.json`'s `packageManager`; install from the committed lockfile with `npm ci`. `npm run check` is the canonical local repository acceptance command. Run the focused checks named by the active task and `git diff --check` as well. `build`, `test`, `typecheck`, and `dev` follow the repository's `package.json` and AGENTS.md; use only capabilities that repository actually has. Network dependency advisories, live GitHub settings verification, releases, and production deployment are separate operations with repository-specific prerequisites.
 
-## Toolchain and locked install
+Shared dependencies and versioned vendor tooling should use one supported version across public repositories when those repositories consume them. GitHub Actions workflows and common npm script names should have equivalent behavior for equivalent capabilities. A library or local-only application does not acquire a hosted deployment merely for parity.
 
-Use Node 26.9.0 with npm 11.19.1. `.node-version` is the Node authority and `package.json` pins
-both the exact npm package manager and supported engine versions. `.npmrc` enables strict engine
-checking, so an unsupported Node/npm pair is rejected instead of becoming accidental local state.
+## Contribution and security boundaries
 
-Install from the committed lockfile with:
-
-```bash
-npm ci
-```
-
-Do not use an install command that rewrites dependency resolution as part of normal acceptance.
-
-## Commands and generated output
-
-After the locked install, use the existing package scripts for the change being made. The two
-broad library commands are:
-
-```bash
-npm run build
-npm run check
-```
-
-`build` regenerates the tracked parts, cosmetics, motion catalog and discovery indexes.
-`check` is the canonical full acceptance command. It runs prospective history validation, the
-repository's deterministic guards, generated-output checks, exchange and wardrobe checks, cruft
-and footprint checks, typecheck, tests and Blender validation. `npm run verify` remains a
-temporary compatibility alias that delegates once to `npm run check`.
-
-Generated files are outputs, not alternate authored sources. Change the appropriate source or
-pipeline, regenerate, review the resulting diff and keep generated files byte-reproducible. Do
-not hand-edit generated output to make a check pass. Temporary render/exchange work belongs in
-`out/`; reset or teardown must not delete authored source or an artist's Blender project.
-
-There is currently no `npm run dev`, browser runtime, server, Worker, hosted environment or
-production deployment for Boneyard. Do not invent one to satisfy a process template.
-
-GitHub Actions runs repository acceptance for pull requests targeting `main` and pushes to
-`main`. CI resolves the committed Node/npm toolchain, installs the lockfile with `npm ci`,
-requires real Blender and invokes `npm run check` once. Local and provider acceptance therefore
-share the package-owned gate rather than duplicating it in workflow YAML.
-
-## Repository settings policy
-
-`config/github-repository-settings.json` is the deterministic desired-state policy for provider
-settings. It requires protected/current `main` with exact `verify` CI, squash-only PR merges,
-automatic completed-branch deletion, zero bypass actors, and immutable `v*` tags. The
-asset/data-library boundary does not add a hosted deployment or npm publication path.
-
-The credential-free process tests compare settings-shaped snapshots with that policy and ignore
-transient provider metadata. They do not prove the current GitHub account, branch protection or
-ruleset state. Live provider verification is a separate read-only controlled operation and any
-tier or permission blocker must be reported rather than inferred away. `npm run test:github-settings`
-is credential-free. `npm run verify:github-settings` only reads live settings, using `GH_ADMIN_TOKEN`
-or an authorized `GH_TOKEN` with Repository Administration read access. The explicit
-`npm run apply:github-settings` command requires write access and independently re-reads live
-state after mutation. Neither command prints or persists the token.
-
-## Attribution and source material
-
-[`LICENSE.md`](LICENSE.md) is the single licence and attribution index for repository data and
-art. Read it before adding, adapting, redistributing or publishing source material. Preserve
-recorded provenance, pinned source revisions or hashes, copyright holders, licence boundaries and
-explicitly unresolved provenance. Do not copy licence text into this guide or infer redistribution
-permission from a file's presence in the repository.
-
-## Release identity
-
-Boneyard stays `private: true`; it is not published to the npm registry. Its immutable release
-identity is an annotated semantic Git tag `vX.Y.Z` whose version exactly matches
-`package.json`, whose peeled commit is the checkout's exact `HEAD`, and whose tree is the same
-repository tree as that `HEAD`. The verifier reads `package.json` from the tagged commit and
-records the tag object, commit, tree and package blob identities so the candidate is tied to
-immutable Git content rather than mutable working files.
-
-Verify a candidate with:
-
-```bash
-npm run verify:release-identity -- --tag v0.1.0
-```
-
-The verifier also requires the tracked index/worktree to match the exact tagged commit. It uses
-only local Git data and repository files; it needs no network or provider credential. Canonical
-`npm run check` exercises its pure identity cases without requiring a release tag on ordinary
-pull requests.
-
-GitHub Releases are the distribution authority for reviewed Boneyard revisions; this task only
-defines the immutable local identity boundary and does not create or publish a release. npm
-publication and hosted deployment remain out of scope. Any future release record must preserve
-the repository's source, provenance and attribution requirements.
+Keep changes scoped to one controlled delivery unless the owner requests portfolio plan maintenance. Record validation and provider actions truthfully. Follow the repository's AGENTS.md for branch, commit, pull request, exact-head CI, and squash-merge requirements. Use [SECURITY.md](SECURITY.md) for security reports. Ownership is defined by AGENTS.md and its linked ownership policy where present.
