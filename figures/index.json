@@ -17,6 +17,11 @@
       "path": "figures/kiran.json"
     },
     {
+      "id": "runner",
+      "name": "Runner",
+      "path": "figures/runner.json"
+    },
+    {
       "id": "yuliya",
       "name": "Yuliya",
       "path": "figures/yuliya.json"

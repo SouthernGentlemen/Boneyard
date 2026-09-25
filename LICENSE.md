@@ -83,6 +83,21 @@ so the provenance remains explicitly unresolved.
 
 `lab*` clips are original to this repository and claim no third-party origin. They are not covered by
 the Bandai Namco CC BY-NC 4.0 licence merely because both kinds of clip share a generated file.
+The `labIdle`, `labWalk`, `labStagger`, `labStrike`, `labOverhead`, and `labGuard` clips were authored
+on the repository's fighter rig for FightLab's publishable presentation lane. They contain no
+Bandai Namco capture data and set `derivedFrom` to `null`.
+
+## Repository-authored FightLab figures
+
+- **Upstream URL:** This repository (Boneyard).
+- **Pinned revision:** The figure manifests are versioned directly by this repository's Git history.
+- **Copyright holder:** The contributors recorded in that history.
+- **Licence:** No separate licence grant has been declared for these repository-authored figures.
+- **Repository paths covered:** `figures/runner.json` and the original
+  `characters/fighter/parts/*.svg` that they reference.
+
+The runner figure reuses the original authored fighter parts and wears no cosmetics. It does not
+reference the Fire Emblem Heroes atlases, royal-guard pieces, or field-kit pieces listed above.
 
 ## Repository-authored weapon art
 

@@ -74,6 +74,11 @@ describe("BVH exchange", () => {
   });
 
   it("keeps every synthetic and validation regression case green", () => {
-    expect(checkExchange()).toMatchObject({ ok: true, clips: 12, failures: [] });
+    const catalog = buildCatalog(ROOT);
+    expect(checkExchange()).toMatchObject({
+      ok: true,
+      clips: Object.keys(catalog.clips).length + Object.keys(catalog.studies).length,
+      failures: [],
+    });
   });
 });
