@@ -15,11 +15,11 @@
     },
     "characters/barst/parts/arm_upper_r.svg": {
       "raw": 2911,
-      "gzip": 1011
+      "gzip": 1010
     },
     "characters/barst/parts/head.svg": {
       "raw": 32287,
-      "gzip": 9762
+      "gzip": 9754
     },
     "characters/barst/parts/leg_lower_l.svg": {
       "raw": 1609,
@@ -27,7 +27,7 @@
     },
     "characters/barst/parts/leg_lower_r.svg": {
       "raw": 2170,
-      "gzip": 822
+      "gzip": 820
     },
     "characters/barst/parts/leg_upper_l.svg": {
       "raw": 1949,
@@ -43,7 +43,7 @@
     },
     "characters/barst/parts/torso.svg": {
       "raw": 9259,
-      "gzip": 2928
+      "gzip": 2922
     },
     "characters/fighter/parts/arm_lower_l.svg": {
       "raw": 139,
@@ -51,7 +51,7 @@
     },
     "characters/fighter/parts/arm_lower_r.svg": {
       "raw": 146,
-      "gzip": 148
+      "gzip": 147
     },
     "characters/fighter/parts/arm_upper_l.svg": {
       "raw": 134,
@@ -59,7 +59,7 @@
     },
     "characters/fighter/parts/arm_upper_r.svg": {
       "raw": 135,
-      "gzip": 141
+      "gzip": 140
     },
     "characters/fighter/parts/head.svg": {
       "raw": 241,
@@ -83,7 +83,7 @@
     },
     "characters/fighter/parts/pelvis.svg": {
       "raw": 136,
-      "gzip": 137
+      "gzip": 136
     },
     "characters/fighter/parts/torso.svg": {
       "raw": 166,
@@ -91,7 +91,7 @@
     },
     "characters/kiran/parts/arm_lower_l.svg": {
       "raw": 4991,
-      "gzip": 1647
+      "gzip": 1645
     },
     "characters/kiran/parts/arm_lower_r.svg": {
       "raw": 3926,
@@ -107,7 +107,7 @@
     },
     "characters/kiran/parts/head.svg": {
       "raw": 37825,
-      "gzip": 11379
+      "gzip": 11348
     },
     "characters/kiran/parts/leg_lower_l.svg": {
       "raw": 2395,
@@ -115,7 +115,7 @@
     },
     "characters/kiran/parts/leg_lower_r.svg": {
       "raw": 2299,
-      "gzip": 873
+      "gzip": 872
     },
     "characters/kiran/parts/leg_upper_l.svg": {
       "raw": 1770,
@@ -131,7 +131,7 @@
     },
     "characters/kiran/parts/torso.svg": {
       "raw": 2813,
-      "gzip": 985
+      "gzip": 983
     },
     "characters/yuliya/parts/arm_lower_l.svg": {
       "raw": 4080,
@@ -139,7 +139,7 @@
     },
     "characters/yuliya/parts/arm_lower_r.svg": {
       "raw": 3613,
-      "gzip": 1226
+      "gzip": 1223
     },
     "characters/yuliya/parts/arm_upper_l.svg": {
       "raw": 3348,
@@ -151,7 +151,7 @@
     },
     "characters/yuliya/parts/head.svg": {
       "raw": 44558,
-      "gzip": 13429
+      "gzip": 13392
     },
     "characters/yuliya/parts/leg_lower_l.svg": {
       "raw": 2786,
@@ -167,55 +167,55 @@
     },
     "characters/yuliya/parts/leg_upper_r.svg": {
       "raw": 2246,
-      "gzip": 849
+      "gzip": 845
     },
     "characters/yuliya/parts/pelvis.svg": {
       "raw": 5456,
-      "gzip": 1759
+      "gzip": 1752
     },
     "characters/yuliya/parts/torso.svg": {
       "raw": 3227,
-      "gzip": 1166
+      "gzip": 1153
     }
   },
   "cosmetics": {
     "cosmetics/armory/longsword.svg": {
       "raw": 5321,
-      "gzip": 1833
+      "gzip": 1830
     },
     "cosmetics/field-kit/field-belt.svg": {
       "raw": 1605,
-      "gzip": 609
+      "gzip": 608
     },
     "cosmetics/field-kit/full-helm.svg": {
       "raw": 4853,
-      "gzip": 1448
+      "gzip": 1445
     },
     "cosmetics/field-kit/long-hair.svg": {
       "raw": 2930,
-      "gzip": 1072
+      "gzip": 1069
     },
     "cosmetics/field-kit/trail-cloak.svg": {
       "raw": 3253,
-      "gzip": 1122
+      "gzip": 1120
     },
     "cosmetics/royal-guard/hood.svg": {
       "raw": 9455,
-      "gzip": 3147
+      "gzip": 3140
     },
     "cosmetics/royal-guard/pauldron.svg": {
       "raw": 5139,
-      "gzip": 1937
+      "gzip": 1916
     },
     "cosmetics/royal-guard/skirt.svg": {
       "raw": 9134,
-      "gzip": 3060
+      "gzip": 3033
     }
   },
   "figures": {
     "figures/barst.json": {
       "raw": 75171,
-      "gzip": 24378
+      "gzip": 24369
     },
     "figures/fighter.json": {
       "raw": 9729,
@@ -223,21 +223,25 @@
     },
     "figures/kiran.json": {
       "raw": 79479,
-      "gzip": 25948
+      "gzip": 25896
+    },
+    "figures/runner.json": {
+      "raw": 1623,
+      "gzip": 1594
     },
     "figures/yuliya.json": {
       "raw": 87726,
-      "gzip": 28686
+      "gzip": 28613
     }
   },
   "catalogs": {
     "catalog/clips.json": {
-      "raw": 41477,
-      "gzip": 5147
+      "raw": 66734,
+      "gzip": 7247
     },
     "figures/index.json": {
-      "raw": 425,
-      "gzip": 170
+      "raw": 520,
+      "gzip": 184
     },
     "cosmetics/index.json": {
       "raw": 2694,
