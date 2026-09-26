@@ -59,6 +59,7 @@ independently re-reads the committed settings contract after applying it.
 
 ## Guides
 
+- [Active implementation plan](IMPLEMENTATION_PLAN.md) — current and future baseline work while the queue is open.
 - [Security policy](SECURITY.md) — private vulnerability reporting and sensitive-data handling.
 - [Contributing](CONTRIBUTING.md) — controlled BY changes, validation, generated outputs,
   attribution and the repository's real capability boundary.
